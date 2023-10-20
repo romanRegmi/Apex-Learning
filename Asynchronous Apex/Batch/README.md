@@ -42,7 +42,10 @@ MyBatch myBatchObj = new MyBatch();
 Id batchId = Database.executeBatch(myBatchObj);
 ```
 
+If needed, you can specify the batch size when invoking the batch:
+
 ```apex
+MyBatch myBatchObj = new MyBatch();
 Id batchId = Database.executeBatch(myBatchObj, 100);
 ```
 
