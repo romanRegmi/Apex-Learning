@@ -15,3 +15,12 @@ Future methods in Salesforce allow you to execute tasks asynchronously in a sepa
 - Future methods are always declared as `static` and return `void`.
 
 - You cannot pass non-primitive data types as parameters to future methods. For example, you cannot pass sObjects or lists of sObjects as arguments. The reason for this limitation is that sObjects might change between the time you call the method and the time it executes.
+
+Best Practices : Future Method
+Ensure future methods execute as fast as possible.
+In case of Web service callouts, try to bundle all callouts together from the same
+future method, rather that using a separate future method for each callout.
+Test that a trigger enqueuing the @future calls is able to handle a trigger collection of
+200 records.
+To process large number of records asynchronously, use Batch Apex instead of future
+methods.
