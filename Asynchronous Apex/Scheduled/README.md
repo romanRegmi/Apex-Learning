@@ -1,3 +1,16 @@
+
+Scheduled Apex
+• You can run Apex classes at a specified time.
+• Run Maintenance tasks on Daily or Weekly basis.
+• Implements Schedulable interface in Apex class.
+
+
+Syntax
+global class SomeClass implements Schedulable {
+global void execute(SchedulableContext ctx) {
+// write some code
+
+
 A CRON expression is basically a string of five or six fields that represents a set of times, normally as
 a schedule to execute some routine.
 Example:
