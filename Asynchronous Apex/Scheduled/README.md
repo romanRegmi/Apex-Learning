@@ -11,6 +11,18 @@ global void execute(SchedulableContext ctx) {
 // write some code
 
 
+
+To schedule the class that you wrote using the UI
+go to quick find --> Apex class --> Schedule Apex
+: only options using this was monthly, daily ir weekly.
+
+If you want to make it every hour use CRON
+
+
+Once a class is scheduled, we cannot edit the classes the scheduled method calls. We cannot even edit the classes inside the classes.
+
+
+
 A CRON expression is basically a string of five or six fields that represents a set of times, normally as
 a schedule to execute some routine.
 Example:

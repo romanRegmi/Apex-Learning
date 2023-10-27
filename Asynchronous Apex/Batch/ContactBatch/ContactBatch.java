@@ -64,8 +64,8 @@ global class ContactBatch implements Database.Batchable<sObject>, Database.State
             Database.SaveResult sr = result.get(i);
             if (sr.isSuccess()) {
                 success_size = success_size + 1;
-                } else {
-                    fail_size = fail_size + 1;
+            } else {
+                fail_size = fail_size + 1;
             }
         }
     }
