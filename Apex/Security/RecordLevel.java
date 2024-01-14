@@ -3,8 +3,9 @@ FROM UserRecordAccess
 WHERE UserId = [single ID] AND RecordId = [single ID]
 
 
-SELECT RecordId 
+List<UserRecordAccess> Lis = [SELECT RecordId 
 FROM UserRecordAccess 
 WHERE UserId=:UserInfo.getUserId() 
     AND HasReadAccess = true 
-    AND RecordId IN :allRecordIds 
+    AND RecordId IN :allRecordIds ];
+
