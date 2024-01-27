@@ -31,8 +31,14 @@ accList = [Select Name from Account where createdDate = TODAY];
 // tomorrow
 accList = [Select Name from Account where EndDate__c = Tomorrow];
 
+// last week
 accList = [Select Name from Account where createdDate = last_week];
+
+// last month
 accList = [Select Name from Account where createdDate = last_month];
+
+// this week
+accList = [Select Name from Account where createdDate = THIS_WEEK];
 
 
 

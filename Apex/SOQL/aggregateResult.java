@@ -9,9 +9,12 @@
 // Will display the sum of amount in all the opportunities
 AggregateResult ar1 = [SELECT SUM(Amount) FROM Opportunity];
 
-// Will return the total nulber of opportunities
+// Will return the total number of opportunities
 Integer i = [SELECT COUNT() FROM Opportunity];
 AggregateResult ar2 = [SELECT COUNT(Id) FROM Opportunity];
+
+// COUNT in dynamic query
+Integer i = Database.countQuery('SELECT count() from Account');
 
 /* Will return the number of opportunities having value in the amount field
  * Will not include the opportunities having amount as null
