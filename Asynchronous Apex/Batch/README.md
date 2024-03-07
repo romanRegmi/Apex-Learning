@@ -67,3 +67,6 @@ AsyncApexJob job = [SELECT Id, Status, JobItemsProcessed, TotalJobItems, NumberO
 2. Database.AllowsCallout (Optional): This interface allows the batch job to make outbound calls (callouts) to external services. It's crucial to annotate your batch class with this interface if you intend to make callouts within the execute method. Remember, callouts introduce additional governor limits and require careful handling of potential errors.
 
 3. Database.Stateful (Optional): This interface enables you to maintain state information between batches during the execution of your batch job. It's particularly useful when you need to track or accumulate data throughout the processing of multiple batches. However, use this interface cautiously as it can impact performance and governor limits due to the need for additional data storage during the batch job.
+
+4. Can we call future from batch ?
+Ans- No, we cannot call otherwise Fatal error(System.AsyncException) error will occur.

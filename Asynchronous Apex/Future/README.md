@@ -69,3 +69,13 @@ public class scheduler implements Schedulable{
 - No, future methods cannot be called from a flow.
 
 
+6. When will we use future methods instead Of Queueable?
+- You can use future methods instead of implementing a Queueable class when your functionality is sometimes executed synchronously and sometimes asynchronously. It's much easier to refactor a method in this manner than converting to a queueable class. This is handy when you discover that part of your existing code needs to be moved to async execution. You can simply create a similar future method that wraps your synchronous method.
+
+Can we call a future method from a future?
+No, it isn't possible. Chaining is only possible in Queueable.
+
+ 5. Can we call batch from future ?
+ Ans- No, We cannot call otherwise Fatal Error(System.AsyncException) error will occur.
+ FATAL_ERROR System.AsyncException: Database.executeBatch cannot be called from a batch start,
+ batch execute, or future method.

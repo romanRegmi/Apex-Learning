@@ -41,3 +41,22 @@ public class SomeClass implements Queueable {
 Here, we are talking about enqueuing jobs in the anynomous window. Say you have 80 queueable. None of them are chained. You call all of them at once jobId1, jobId2.... jobId80. Then, this will not work. 
 
 Although queueable can accept non-primitive, we don't usually pass the records. We pass their ids. and query the records. This prevents data loss. 
+
+
+2. Can I do callouts from a Queueable Job?
+- Yes, you have to implement the Database.AllowsCallouts interface to do callouts from Queueable Jobs.
+
+
+6. Can we call future and batch from Queueable ?
+Ans: Yes we can call future and batch from Queueable and vice-versa.
+public class QueuableApexExample implements Queueable {
+public static void execute(QueueableContext QC){
+Account act = new Account(Name = 'Tested Accctt 97', Phone='0523124578',
+isAddress__c=true);
+insert act;
+futureMethodExample.MyFutureMethod1();
+}
+}
+
+Q. I have 200 records to be processed using Queueable Apex, How Can I divide theexecution Context for every 100 records?
+Similar to future jobs, queueable jobs don't process batches, so you can't divide the execution Context. It will process all 200 records, in a single execution Context 

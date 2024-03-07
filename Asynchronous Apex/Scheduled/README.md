@@ -64,3 +64,22 @@ jobs:
  LIMIT 1];
  // Abort the job using the CronTrigger Id
  System.abortJob(jobTrigger.Id)
+
+
+ Can we call batch from schedule apex ?
+ Ans - Yes, We can call batch from schedule apex.
+public class ScheduledBatchClassPractice implements schedulable{
+ 
+ public void execute(SchedulableContext sc){
+ try{
+BatchClassPractice btch = new BatchClassPractice(); // You can call batch class from schedule apex
+ database.executeBatch(btch,400);
+ 
+ // Call the future method in schedulable apex
+ futureMethodExample.MyFutureMethod1();
+ }catch(exception e){
+ System.debug('Exception in ScheduledBatchClassPractice: ' + e.getMessage());
+ }
+ 
+ }
+}
