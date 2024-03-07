@@ -41,3 +41,26 @@ Once a class is scheduled, you cannot edit the classes the scheduled method call
 1. You can have a maximum of 100 scheduled jobs at one time.
 2. If you schedule a class from a trigger, ensure that the trigger won't exceed the limit of scheduled jobs.
 3. Synchronous web service callouts are not supported from scheduled Apex. To make a synchronous callout, place the callout in a method annotated with **@future(callout=true)** and call this method from scheduled Apex. If scheduled Apex executes a batch job, callouts are supported from the batch class.
+
+
+ 11. What are the way of monitor the schedule job ?
+ Ans: There are two way of monitior the job
+ 
+ 1. Apex Jobs Page:
+Setup > Apex Jobs to see a list of Apex jobs, including scheduled jobs, their status, and
+execution details.
+ 2. Developer Console:
+You can use the Developer Console to monitor and debug scheduled jobs. In the Developer
+Console, go to the "Query Editor" tab and execute the following query to retrieve scheduled
+jobs:
+ SELECT Id, CronExpression, NextFireTime, PreviousFireTime, StartTime, EndTime, Status, 
+ JobItemsProcessed, TotalJobItems, NumberOfErrors, ExtendedStatus FROM CronTrigger 
+ WHERE CronJobDetail.JobType = '7'
+
+
+12. How can we stop scheduling job ?
+ Ans: // Retrieve the CronTrigger Id of the scheduled job String jobName = 'YourScheduledJobName';
+ CronTrigger jobTrigger = [SELECT Id FROM CronTrigger WHERE CronJobDetail.Name = :jobName
+ LIMIT 1];
+ // Abort the job using the CronTrigger Id
+ System.abortJob(jobTrigger.Id)
