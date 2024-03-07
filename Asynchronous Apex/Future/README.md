@@ -48,6 +48,8 @@ If I have written more than one System.enqueueJob call, what will happen?
 System will throw LimitException stating "Too many queueable jobs added to
 the queue: N"
 
+Cannot call future from future.
+
 Q. How can I use the Job ld to trace the Queuable Job?
 Just perform a SOQL query on AsyncApexJob by filtering on the job ID.
 AsyncApexJob joblnfo - (SELECT Status.NumberOfErrors FROM AsyncApexJob WHERE ld-iobiDJ:
