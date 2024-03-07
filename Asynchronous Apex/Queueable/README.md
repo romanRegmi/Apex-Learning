@@ -60,3 +60,30 @@ futureMethodExample.MyFutureMethod1();
 
 Q. I have 200 records to be processed using Queueable Apex, How Can I divide theexecution Context for every 100 records?
 Similar to future jobs, queueable jobs don't process batches, so you can't divide the execution Context. It will process all 200 records, in a single execution Context 
+
+
+
+
+`@future` methods and Queueable Apex both provide asynchronous processing in Salesforce, but they have different use cases and considerations. Here are situations when you might choose one over the other:
+
+**Use `@future` Methods When:**
+
+1. **Simplicity**: If you have a simple, straightforward task that doesn't require chaining multiple jobs or complex logic, `@future` methods are easier to implement.
+
+2. **Governor Limits**: `@future` methods have their own set of governor limits, which are separate from the synchronous limits. This can be beneficial when you want to perform additional processing within the same transaction and need to stay within the same set of limits.
+
+3. **Non-Serializable Data**: If your task involves non-serializable data (e.g., non-primitive data types or objects that can't be passed between transactions), `@future` methods allow you to work with these data types directly.
+
+4. **Simple Error Handling**: If you have simple error handling needs (e.g., you don't need to manage retries or complex error scenarios), `@future` methods are straightforward to work with.
+
+**Use Queueable Apex When:**
+
+1. **Complex Processing**: If your task requires more complex processing, such as chaining multiple jobs together, managing dependencies between jobs, or passing data between them, Queueable Apex provides more flexibility.
+
+2. **Error Handling and Retry**: Queueable Apex allows you to handle errors, implement retry mechanisms, and manage more complex error scenarios.
+
+3. **Bulk Processing**: If you need to process a large volume of records efficiently and want to implement bulk processing, Queueable Apex is a better choice. It allows you to divide the work into multiple Queueable jobs, which can run concurrently.
+
+4. **Long-Running Jobs**: For long-running jobs or tasks that are expected to run for a significant amount of time, Queueable Apex is preferred. It's more suitable for tasks that may span several minutes or even hours.
+
+5. **Monitoring and Debugging**: Queueable Apex provides more visibility and monitoring options, making it easier to track and manage long-running jobs or complex processing flows.

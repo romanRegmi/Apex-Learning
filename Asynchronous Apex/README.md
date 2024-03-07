@@ -34,3 +34,14 @@ Asynchronous Apex provides several advantages, including:
 
 
 # Interview Questions on Asynchronous Apex
+
+Q. What is the Apex Flex Queue?
+
+The Apex Flex queue enables you to submit up to 100 batch jobs for execution. Any jobs that are submitted for execution are in holding status and are placed in the Apex Flex Queue. Up to 100 batch jobs can be in the holding status.
+
+Q. Can you change order of job in Apex Flex Queue?
+
+Jobs are processed first-in first-out-in the order in which they're submitted. You can look at the current queue order and shuffle the queue, so that you could move an important job to the front, or less important ones to the back.
+```apex
+Boolean isSuccess = System.FlexQueue.moveBeforeJob(jobToMoveId, jobInQueueId);
+```
