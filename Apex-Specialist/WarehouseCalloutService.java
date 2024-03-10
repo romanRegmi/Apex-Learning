@@ -3,7 +3,8 @@ public with sharing class WarehouseCalloutService implements Queueable {
     
     //class that makes a REST callout to an external warehouse system to get a list of equipment that needs to be updated.
     //The callout’s JSON response returns the equipment records that you upsert in Salesforce. 
-    
+
+    // Do we have to make it a future method?
     @future(callout=true)
     public static void runWarehouseEquipmentSync(){
         Http http = new Http();
