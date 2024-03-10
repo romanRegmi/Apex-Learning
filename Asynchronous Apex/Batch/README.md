@@ -102,3 +102,6 @@ In Salesforce, when you want to process data from a CSV file in a Batch class, i
 To use `Database.Batchable` with a CSV file, you typically load the CSV data into a custom or standard object in Salesforce (e.g., using `Batchable`'s `start` method to query the CSV data) and then process it in batches.
 
 On the other hand, `Iterable` is more suitable when you have a relatively small amount of data to process and can load the data directly from a collection or an external source without the need for dividing it into batches. It's typically used for in-memory processing of data rather than processing large datasets from external files like CSV.
+
+
+Maximum batch size: Default is 200 records per batch, but can be set up to 2,000.
