@@ -83,3 +83,41 @@ BatchClassPractice btch = new BatchClassPractice(); // You can call batch class 
  
  }
 }
+
+Q. What are limitations of Scheduled Apex?
+
+1. We can schedule only 100 jobs at a time.
+2. Max no. of apex schedule jobs in 24 hours is 2,50,000 number of jobs (can change with
+salesforce updates).
+3. Synchronous WebService callouts are not supported in schedulable Apex.
+
+Does the apex scheduler run in system mode?
+The scheduler runs in system mode. All classes are executed, whether or not the user has permission to execute the class. 
+
+
+A scheduled class can be scheduled from code and UI. 
+
+
+In Apex, when you create a schedulable class (a class that implements the `Schedulable` interface), it must be defined with the `global` access modifier for the `execute` method. This is a Salesforce requirement, and there's a specific reason for it:
+
+1. **Access from Different Contexts**: The `global` access modifier for the `execute` method allows the schedulable class to be invoked from different contexts, including managed packages. When a class is defined as `global`, it can be accessed and executed from contexts outside of its own namespace. This is essential for providing flexibility and allowing Salesforce administrators and developers to schedule or run jobs regardless of the code's origin.
+
+For example, if a managed package includes a schedulable class, it must be `global` to be scheduled by the org's administrators, even if the package is installed by a different organization.
+
+Here's a simplified example of a schedulable class:
+
+```apex
+global class MySchedulableClass implements Schedulable {
+    global void execute(SchedulableContext sc) {
+        // Your scheduled logic here
+    }
+}
+```
+
+By defining the `execute` method as `global`, it ensures that the class can be scheduled and executed in various Salesforce contexts. This access level aligns with Salesforce's security and encapsulation model, providing controlled access to the class's functionality from external contexts when needed.
+
+
+What is the governot limit of schedule apex?
+We can have 100 scheduled apex jobs at one time.
+
+We cannot make callouts from a scheduled class. We need to use future methods if we want to.

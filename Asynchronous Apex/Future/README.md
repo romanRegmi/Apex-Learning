@@ -118,3 +118,19 @@ In summary, these limitations and restrictions are in place to ensure the orderl
 
 
 We cannot directly call a future method from a flow. You can call an invokable flow. If a class has an invocable method, then it cannot have another annotation. A class cannot be invokable and future at the same time. Your invocable method can call another method and that method can be future.
+
+
+
+Setup objects cannot be updated with non-setup objects because it might cause data visibility issues. As you might change the account owner’s profile and now the new profile might not even have the view permission on the account whereas you updated the account in the same transaction.
+
+
+We can’t call a future method from a future method. We will get a runtime error async exception that the future method cannot be called from a future or batch.
+
+We can only call one queueable and schedulable apex from a future method. 
+
+
+Limitations
+
+Cannot be monitored
+cannot pass sObject, List<sObject> as paramenters
+No more than 50 method calls per apex invocations.

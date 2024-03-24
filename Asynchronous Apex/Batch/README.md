@@ -1,5 +1,5 @@
 # Batch Apex
-Batch Apex is a powerful Salesforce feature that allows you to process large jobs efficiently. It's designed to handle thousands or even millions of records, making it ideal for data cleansing, archiving, or any operation that requires the processing of a massive amount of data.
+Batch Apex is a powerful Salesforce feature that allows you to process large jobs efficiently. It's designed to handle thousands or even millions of records, making it ideal for data cleansing, archiving, or any operation that requires the processing of a massive amount of data. The max number of batch executions is 250000 per day.
 
 ## Key Features
 * Batch Apex processes records asynchronously in batches.
@@ -57,7 +57,7 @@ AsyncApexJob job = [SELECT Id, Status, JobItemsProcessed, TotalJobItems, NumberO
 ```
 
 ## Life Cycle of a Batch Apex Class
-Life Cycle of Batch Apex
+Life Cycle of Batch Apex (Status of jobs in the Apex Flex Queue)
 
 1. Holding: - Job has been submitted and is held in the Apex flex queue until system resources become available to queue the job for processing.
 2. Queued : - Job is awaiting execution.
@@ -105,3 +105,41 @@ On the other hand, `Iterable` is more suitable when you have a relatively small 
 
 
 Maximum batch size: Default is 200 records per batch, but can be set up to 2,000.
+
+
+17. Can I add a additional method in batch class?
+
+Yes, you can add additional methods to a batch class, as long as you follow the basic structure and syntax
+requirements of a batch class.
+
+However, keep in mind that any additional methods you add to a batch class should not interfere with the
+standard functionality of the batch class. The main entry point of a batch class is the execute() method, which
+is called when the batch job is started, so any additional methods should not interfere with this method.
+
+Additionally, if you plan to use any additional methods in your batch class from outside the class (for
+example, in a test class), make sure to mark them as public so they can be accessed from other classes.
+
+
+We can call batch apex from batch apex in finally.
+
+
+Can we call the batch apex from triggers in salesforce?
+
+Yes, it is possible. We can call a batch apex from trigger but we should always
+keep in mind that we should not call batch apex from trigger each time as this
+will exceeds the governor limit this is because of the reason that we can only
+have 5 apex jobs queued or executing at a time.
+
+How to test batch apex?
+
+Code is run between test.startTest and test.stopTest. Any asynchronous code
+included within Test.startTest and Test.stopTest is executed synchronously after
+Test.stopTest.
+
+How many batch jobs can run concurrently?
+The system can process upto five queued or active jobs simultaneously for each org.
+
+Q. Can I Use FOR UPDATE in SOQL using Database.QueryLocator?
+
+No, We can't. It will through an exception stating that "Locking is implied for each
+batch execution and therefore FOR UPDATE should not be specified"

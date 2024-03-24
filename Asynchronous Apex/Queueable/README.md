@@ -87,3 +87,50 @@ Similar to future jobs, queueable jobs don't process batches, so you can't divid
 4. **Long-Running Jobs**: For long-running jobs or tasks that are expected to run for a significant amount of time, Queueable Apex is preferred. It's more suitable for tasks that may span several minutes or even hours.
 
 5. **Monitoring and Debugging**: Queueable Apex provides more visibility and monitoring options, making it easier to track and manage long-running jobs or complex processing flows.
+
+
+
+Q. How to test Chaining?
+
+You can't chain queueable jobs in an Apex test.
+So you have to write separate test cases for each
+chained queueable job. Also, while chaining the
+jobs, add a check of Test.isRunningTest() before
+calling the enqueueJob.
+
+Test.isRunningTest() Returns true if the currently
+executing code was called by code contained in a
+test method, false otherwise
+
+Can I chain a job that has implemented allowCalloutsfrom a Job that doesn't have?
+Yes, callouts are also allowed in chained queueable jobs.
+
+
+Q. What is Transaction Finalizers (Beta) ?
+
+Transaction Finalizers feature enables you to attach actions, using
+the System.Finalizer interface, to asynchronous Apex jobs that use
+the Queueable framework.
+
+Before Transaction Finalizers, there was no direct way for you to
+specify actions to be taken when asynchronous jobs succeeded or
+failed. With transaction finalizers, you can attach a post-action
+sequence to a Queueable job and take relevant actions based on
+the job execution result.
+
+A Queueable job that failed due to an unhandled exception can be
+successively re-enqueued five times by a Transaction.
+
+Example: We try to make a callout to an extemnal platform, because
+of network issue, if the callout fails, how do we make sure that the
+callout is made again and re-enqueued?
+
+We need to get the Jobld after the callout is made, then check the
+status of the Job, if it failed then we need to re-enqueue it manually.
+
+Salesforce team launched something called Finalizers which will
+make the whole process of re-enqueueing the failed queueable job
+so easy.
+
+We cannot re-enqueue a job more than 5 times
+
