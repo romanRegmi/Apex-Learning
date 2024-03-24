@@ -121,3 +121,55 @@ What is the governot limit of schedule apex?
 We can have 100 scheduled apex jobs at one time.
 
 We cannot make callouts from a scheduled class. We need to use future methods if we want to.
+
+We can schedule a class using CORN Expression or Standard Wizard.
+
+What is an apex Scheduler?
+
+The Apex Scheduler lets you delay execution so that you can run Apex
+classes at a specified time. This is ideal for daily or weekly maintenance tasks
+using Batch Apex.
+
+What happens after the class is scheduled?
+
+After a class has been scheduled, a CronTrigger object is created that represents the scheduled
+job. It provides a getTriggerld method that returns the ID of a CronTrigger API object.
+What are the arguments of the System.Schedule method?
+The System.Schedule method takes three arguments:
+Name for the job
+CRON expression used to represent the time and date the job is scheduled to run
+Name of the class.
+
+
+How to monitor Scheduled Jobs?
+
+After an Apex job has been scheduled, you can obtain more information about it
+by running a SOQL query on CronTrigger.
+CronTrigger job = [SELECT Id, CronJobDetail.Id, CronJobDetail.Name,
+CronJobDetail.JobType FROM CronTrigger ORDER BY CreatedDate DESC
+LIMIT 1];
+
+
+Q. Write an expression to schedule an operation on Jan Tuesday 12:30 ?
+
+'0 30 12 ? 1 TUES'
+'0 30 12 ? 1 3'
+
+'Seconds': 0
+'Min' : 30
+'Hours' : 12
+'Day-Months' : ?
+'Month' : 1
+'Day-Week' : 3
+'Optional Year': -
+
+
+Q. How to Call batch apex from schedulable class?
+
+Create instance of batchClass and then pass the instance in database.executebatch
+
+batchable b = new batchable();
+dacabase.executebatch(b);
+
+An easier way to schedule a batch job is to call the System.scheduleBatch method without
+having to implement the Schedulable interface.

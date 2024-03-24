@@ -75,5 +75,7 @@ Once the Batch job is excution is over it status is changed to "Completed".
 
 Setup -- > Monitor -- > Jobs -- > Apex Flex Queue.
 
+If 100 requests are sent, the first 5 will be sent to apex queue and the rest 95 will be sent to flex queue. If a request in apex queue fails, it is sent back to the flex queue. 
+
 
 Salesforce only recommends us to schedule our batches. Otherwise, it is advised to not mix async processes in salesforce.

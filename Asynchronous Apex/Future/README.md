@@ -134,3 +134,10 @@ Limitations
 Cannot be monitored
 cannot pass sObject, List<sObject> as paramenters
 No more than 50 method calls per apex invocations.
+
+Can we pass wrapper to future method?
+
+You can pass wrapper, but for that, you'll need to serialize/deserialize that
+parameter. You can convert the Wrapper to a String which is a primitive. Once
+converted into a String you can them pass that string as a parameter to the
+future method in consideration.

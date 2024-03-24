@@ -143,3 +143,101 @@ Q. Can I Use FOR UPDATE in SOQL using Database.QueryLocator?
 
 No, We can't. It will through an exception stating that "Locking is implied for each
 batch execution and therefore FOR UPDATE should not be specified"
+
+
+
+To track a particular process of a batch apex, we use Database.BatchableContext. We have two methods in this interface
+getJObId
+getChildJObId - id of particular execute method.
+
+
+Are you looking to create a test class for a batch apex which is calling another batch Apex. The process is same you just need to make sure that you are inserting the data which is being queried in the Start method
+
+
+Q. How to use Aggregate queries in Batch Apex
+
+Aggregate queries don't work in Batch Apex because aggregate queries doesn't
+support queryMore(). They run into the error 'Aggregate query does not support
+queryMore(), use LIMIT to restrict the results to a single batch'
+To fix this error what we should do.
+
+1. Create an Apex class implements Iterator<AggregateResult>.
+2. Create an Apex class implements Iterable<AggregateResult>.
+3. Implementing to Database.Batchable<AggregateResult>, and Using Iterable at
+start execution in Batch Apex.
+
+Q.What is the difference between database.batchable & database.batchablecontext bc?
+
+1. database.batchable is an interface.
+
+2. database.batchableContext is a context variable which store the runtime
+information eg jobld
+
+Q. Which platform event can fire from batch ?
+
+The BatchApexErrorEvent object represents a platform event associated with a batch Apex
+class.
+It is possible to fire platform events from batch apex. So whenever any error or exception
+occurs, you can fire platform events which can be handled by different subscriber.
+Batch class needs to implement "Database.RaisesPlatformEvents" interface in order to fire
+platform event.
+
+Q. Want to schedule batch job at one time only and not again. How to do it?
+System.scheduleBatch() is used to run a schedule a batch job only once for a future time. This method has got 3 parameters.
+
+param 1 : Instance of a class that implements Database.Batchable interface.
+param 2 : Job name.
+param 3 : Time interval after which the job should start executing.
+param 4 : It's an optional parameter which will define the no. of that processed at a time. The system.scheduleBatch() returns the scheduled job Id.
+We can use the job Id to abort the job.
+
+This method returns the scheduled job ID also called CronTrigger ID
+
+String cronID = System.scheduleBatch(reassign, 'job example', 1);
+CronTrigger ct = [SELECT Id, TimesTriggered, NextFireTime FROM CronTrigger WHERE Id = :cronID];
+
+This method is available only for batch classes and doesn't require the implementation of the Schedulable interface.
+This makes it easy to schedule a batch job for one execution.
+
+Can I call Queueable from a batch?
+
+Yes, But you're limited to just one System.enqueueJob call per execute in the
+Database.Batchable class. Salesforce has imposed this limitation to prevent
+explosive execution.
+
+How many records we can insert while testing batch apex?
+
+We have to make sure that the number of records inserted is less than or equal to
+the batch size of 200 because test methods can execute only one batch. We must
+also ensure that the Iterable returned by the start method matches the batch size.
+
+Q. Let's say, I have 150 Batch jobs to execute, Will I be able to queue them in one go?
+
+. Once you run Database.executeBatch, the Batch jobs will be placed in the
+Apex flex queue and its status becomes Holding. The Apex flex queue has
+the maximum number of 100 jobs, Database.executeBatch throws a
+LimitException and doesn't add the job to the queue. So atmost 100 jobs can
+be added in one go.
+
+Q. How can you stop a Batch job?
+
+The Database.executeBatch and System.scheduleBatch method returns an ID
+that can be used in System.abortJob method.
+
+Q. Can I query related records using Database.QueryLocator?
+
+Yes, You can do subquery for related records, but with a relationship subquery, the
+batch job processing becomes slower. A better strategy is to perform the subquery
+separately, from within the execute method, which allows the batch job to run
+faster.
+
+Q. Let's say Record A has to be processed before Record B, but Record B came in the first
+Batch and Record A came in the second batch. The batch picks records which are
+unprocessed every time it runs. How will you control the processing Order?
+
+The Processing order can't be controlled, but we can bypass the record B
+processing before Record A. We can implement Database.STATEFUL and use
+one class variable to track whether Record A has processed or not. If not
+processed and Record B has come, don't process Record B. After all the
+execution completes, Record A has already been processed so Run the batch
+again, to process Record B.
