@@ -1,7 +1,7 @@
 /*
  * An interface is private by default.
  * Methods in an interface are by default abstract.
- * Abstract methods must be implemented.
+ * Abstract methods must be implemented by the classes that extend it.
  * Abstract methods aren't defined. 
 */
 interface DogInterface {

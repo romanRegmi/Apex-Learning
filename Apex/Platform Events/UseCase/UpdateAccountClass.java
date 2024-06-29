@@ -10,8 +10,7 @@ public class UpdateAccountClass {
         if (sr.isSuccess()) {
             System.debug('Successfully queued event.');
         } else {
-            System.debug('Error queuing event. ');
-
+            System.debug('Error queuing event.');
         }
     }
 }

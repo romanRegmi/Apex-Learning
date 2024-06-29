@@ -44,6 +44,8 @@ Id batchId = Database.executeBatch(myBatchObj);
 
 If needed, you can specify the batch size when invoking the batch:
 
+Maximum batch size: Default is 200 records per batch, but can be set up to 2,000.
+
 ```apex
 MyBatch myBatchObj = new MyBatch();
 Id batchId = Database.executeBatch(myBatchObj, 100);
@@ -82,59 +84,48 @@ Life Cycle of Batch Apex (Status of jobs in the Apex Flex Queue)
 
 
 
-4. Can we call future from batch ?
+2. Can we call future from batch ?
 Ans- No, we cannot call otherwise Fatal error(System.AsyncException) error will occur.
 
 
 
 In Salesforce, when you want to process data from a CSV file in a Batch class, it's generally more appropriate to use the `Database.Batchable` interface rather than `Iterable`. Here's why:
 
-1. **Scalability**: `Database.Batchable` is designed for processing large volumes of data efficiently. It allows you to divide the data into manageable chunks (batches), making it suitable for handling CSV files with a significant number of records.
+    1. **Scalability**: `Database.Batchable` is designed for processing large volumes of data efficiently. It allows you to divide the data into manageable chunks (batches), making it suitable for handling CSV files with a significant number of records.
 
-2. **Governor Limits**: Batch jobs that implement `Database.Batchable` have separate governor limits from synchronous transactions, which provides flexibility for processing large datasets without hitting the same limits.
+    2. **Governor Limits**: Batch jobs that implement `Database.Batchable` have separate governor limits from synchronous transactions, which provides flexibility for processing large datasets without hitting the same limits.
 
-3. **Error Handling**: `Database.Batchable` provides better error handling capabilities. You can track and manage failed records, which is essential when dealing with data from external sources like CSV files.
+    3. **Error Handling**: `Database.Batchable` provides better error handling capabilities. You can track and manage failed records, which is essential when dealing with data from external sources like CSV files.
 
-4. **Asynchronous Processing**: Batch jobs can run asynchronously, freeing up system resources and allowing users to continue working without waiting for data processing to complete.
+    4. **Asynchronous Processing**: Batch jobs can run asynchronously, freeing up system resources and allowing users to continue working without waiting for data processing to complete.
 
-5. **Automatic Checkpointing**: `Database.Batchable` automatically handles checkpointing, which is useful for resuming processing if the batch job is interrupted or needs to be rerun.
+    5. **Automatic Checkpointing**: `Database.Batchable` automatically handles checkpointing, which is useful for resuming processing if the batch job is interrupted or needs to be rerun.
 
 To use `Database.Batchable` with a CSV file, you typically load the CSV data into a custom or standard object in Salesforce (e.g., using `Batchable`'s `start` method to query the CSV data) and then process it in batches.
 
 On the other hand, `Iterable` is more suitable when you have a relatively small amount of data to process and can load the data directly from a collection or an external source without the need for dividing it into batches. It's typically used for in-memory processing of data rather than processing large datasets from external files like CSV.
 
 
-Maximum batch size: Default is 200 records per batch, but can be set up to 2,000.
 
+3. Can I add a additional method in a batch class?
 
-17. Can I add a additional method in batch class?
+Yes, you can add additional methods to a batch class, as long as you follow the basic structure and syntax requirements of a batch class.
 
-Yes, you can add additional methods to a batch class, as long as you follow the basic structure and syntax
-requirements of a batch class.
+However, keep in mind that any additional methods you add to a batch class should not interfere with the standard functionality of the batch class. The main entry point of a batch class is the execute() method, which is called when the batch job is started, so any additional methods should not interfere with this method.
 
-However, keep in mind that any additional methods you add to a batch class should not interfere with the
-standard functionality of the batch class. The main entry point of a batch class is the execute() method, which
-is called when the batch job is started, so any additional methods should not interfere with this method.
+Additionally, if you plan to use any additional methods in your batch class from outside the class (for example, in a test class), make sure to mark them as public so they can be accessed from other classes.
 
-Additionally, if you plan to use any additional methods in your batch class from outside the class (for
-example, in a test class), make sure to mark them as public so they can be accessed from other classes.
+4. Can we call a batch class from another batch class?
+Yes, we can call batch apex from batch apex in finally.
 
+5. Can we call the batch apex from triggers in salesforce?
 
-We can call batch apex from batch apex in finally.
+Yes, it is possible. We can call a batch apex from triggers. However, we should always keep in mind that we should not call batch apex from trigger every time as this
+may cause the governor limit to exceed. We can only have 5 apex jobs queued or executing at a time.
 
+6. How to test a batch apex?
 
-Can we call the batch apex from triggers in salesforce?
-
-Yes, it is possible. We can call a batch apex from trigger but we should always
-keep in mind that we should not call batch apex from trigger each time as this
-will exceeds the governor limit this is because of the reason that we can only
-have 5 apex jobs queued or executing at a time.
-
-How to test batch apex?
-
-Code is run between test.startTest and test.stopTest. Any asynchronous code
-included within Test.startTest and Test.stopTest is executed synchronously after
-Test.stopTest.
+Code is run between Test.startTest and Test.stopTest. Any asynchronous code included within Test.startTest and Test.stopTest is executed synchronously after Test.stopTest.
 
 How many batch jobs can run concurrently?
 The system can process upto five queued or active jobs simultaneously for each org.
@@ -241,3 +232,10 @@ one class variable to track whether Record A has processed or not. If not
 processed and Record B has come, don't process Record B. After all the
 execution completes, Record A has already been processed so Run the batch
 again, to process Record B.
+
+
+Q How can we make a batch job to skip the queue and get higher priority?
+```apex
+Id highPriorityJobId = Database.executeBatch(new HighPriorityBatchClass(), 200);
+Boolean jobMovedToFrontOfQueue = FlexQueue.moveJobToFront(highPriorityJobId);
+```
