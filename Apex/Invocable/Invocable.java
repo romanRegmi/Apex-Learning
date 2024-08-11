@@ -23,9 +23,9 @@ public class WelcomeClass {
     @InvocableMethod(label='Displays a Welcome Message' description='This method will retutn a welcome message' category='RomanRegmi')
         public static List<String> welcomeMessage(List<String> inputs) { // Method will always recieve a list as a parameter.
             String userName = inputs.get(0);
-            /* The invocable method will always return a List.
+            /* The invocable method will always return a List. (Passing values from the flow to an apex)
              * Welcome Message typeof - String => List<String> (If you want to return a string, you'll have to return a list of string)
-             * List<String> => List<List<String>> (If you want to return a string, you'll have to return a list of list of string)
+             * List<String> => List<List<String>> (If you want to return a list of string, you'll have to return a list of list of string)
             */
         }
 }
