@@ -21,7 +21,7 @@ public with sharing class VerifyPhoneNumbers {
         HttpResponse httpRes = new HttpResponse();
 
         /*
-        * DML shouldn't happen inbetween callous
+        * DML shouldn't happen inbetween callouts
         */
 
         try{ 
