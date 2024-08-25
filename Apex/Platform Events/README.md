@@ -71,3 +71,5 @@ after the other.
 Event consumers: Event consumers subscribe to an
 event. The moment that event gets put onto the
 event bus, the event consumer will be notified.
+
+Platform events cannot be queried.

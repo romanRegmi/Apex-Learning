@@ -132,8 +132,7 @@ The system can process upto five queued or active jobs simultaneously for each o
 
 Q. Can I Use FOR UPDATE in SOQL using Database.QueryLocator?
 
-No, We can't. It will through an exception stating that "Locking is implied for each
-batch execution and therefore FOR UPDATE should not be specified"
+No, We can't. It will through an exception stating that "Locking is implied for each batch execution and therefore FOR UPDATE should not be specified"
 
 
 
@@ -239,3 +238,70 @@ Q How can we make a batch job to skip the queue and get higher priority?
 Id highPriorityJobId = Database.executeBatch(new HighPriorityBatchClass(), 200);
 Boolean jobMovedToFrontOfQueue = FlexQueue.moveJobToFront(highPriorityJobId);
 ```
+
+What is the difference between the Stateful and Stateless batch jobs?
+Using Stateful Batch Apex
+If your batch process needs information that is shared across transactions, one approach is to make the Batch Apex class itself stateful by implementing the Stateful interface. This instructs Force.com to preserve the values of your static and instance variables between transactions.
+global class SummarizeAccountTotal implements Database.Batchable<sObject>, Database.Stateful{
+}
+In Short, if you need to send a mail to check the number of records passed and failed in the batch job counter, in that case, can you Stateful batch job?
+If you want to create one counter and share/ use it in each execute method use the same.
+Using Stateless Batch Apex
+Batch Apex is stateless by default. That means for each execution of your execute method, you receive a fresh copy of your object. All fields of the class are initialized, static and instance.
+global class SummarizeAccountTotal implements Database.Batchable<sObject>{
+}
+
+
+start
+
+. Collect the records or objects to be passed to the interface method
+execute for processing.
+. start method is called once at the beginning of a Batch Apex Job.
+. It returns a Database.QueryLocator object or an Iterable that
+contains the records or objects passed to the job.
+. When QueryLocator object is used, the governor limit for the total
+number of records retrieved by SOQL queries is bypassed and 50
+million records can be queried. .
+. Whereas with an Iterable, governor limit by SOQL queries is
+enforced.
+
+execute
+
+. Performs actual processing for each batch of data passed.
+· Default batch size is 200 records.
+. Batches of records can execute in any order, it doesn't
+depends on which order they are received from the start
+method.
+. It takes a reference to the Database.BatchableContext object
+and A List<sObject> or a list of parameterized types.
+. When using Database.QueryLocator use the returned list.
+
+
+
+finish
+
+· Execute post-processing operations.
+. Calls once after all batches are processed.
+. For example, sending an email process can be implemented
+in finish method.
+
+
+
+Invoke a Batch Class
+
+MyBatch myBatchObj = new MyBatch( );
+Id batchld = Database.executeBatch(myBatchObj);
+
+Pass Batch Size if needed:
+
+Id batchld = Database.executeBatch(myBatchObj, 100);
+
+AsyncApexJob Record
+
+. Each Batch Apex invocation creates an AsyncApexJob
+record.
+. It helps to track progress of the job.
+
+AsyncApexJob job = [SELECT Id, Status, JobltemsProcessed,
+TotalJobltems, NumberOfErrors FROM AsyncApexJob WHERE
+ID = :batchld ];

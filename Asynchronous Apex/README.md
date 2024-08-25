@@ -79,3 +79,7 @@ If 100 requests are sent, the first 5 will be sent to apex queue and the rest 95
 
 
 Salesforce only recommends us to schedule our batches. Otherwise, it is advised to not mix async processes in salesforce.
+
+You can also monitor the status of Apex jobs in the Apex Flex Queue, and reorder them to control which jobs are processed first. From Setup, enter Jobs in the Quick Find box, then select Apex Flex Queue.
+
+Async processes will be available in Quick Find → Apex Jobs

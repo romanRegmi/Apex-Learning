@@ -16,6 +16,7 @@
 * 2000 executed elements at runtime. (Elements in a for loop)
 * Map<Key, Value> is not supported in the flows.
 * Date operations are not supported in flows.
+* As of fall 2023, we  can’t return a list of Accounts in an invokable class (can’t return objects). You will have to return a list of Ids. You can also return other things like Boolean or string, but not objects.
 */
 
 public class WelcomeClass {

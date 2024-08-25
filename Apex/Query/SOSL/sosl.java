@@ -1,7 +1,12 @@
 /*
  * SOSL - Salesforce Object Search Language
+ * Used to perform text based search on all/multiple of the records in a database irrespective of the object. 
+ * Used when we don’t know the object or the field the record is in. 
+ * We can however specify the objects and fields the search should take place in. 
  * RETURN TYPE : List of list of sobject
 */
+
+However, for each Apex transaction, the governor limit for SOSL queries is 2,000; for SOQL queries it’s 50,000. So if you need to retrieve more than 2,000 records, SOQL is the better choice.
 
 List<List<sObject>> l2 = [Find 'John' Returning Account(Name, Phone, NumberOfEmployees), Contact(LastName), student__c(Name, Student_Name__c)];
 

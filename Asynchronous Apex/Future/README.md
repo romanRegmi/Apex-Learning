@@ -25,6 +25,13 @@ Future methods in Salesforce allow you to execute tasks asynchronously in a sepa
 
 - Pass an Id or a collection of Ids instead of records or record field values to the method and query the field value or records later.
 
+## Limitations
+- Future methods cannot be monitored
+
+- We cannot pass an sObject or a List of sObjects as paramenters
+
+- We canoot make more than 50 method calls per apex invocations.
+
 ## Interview Questions
 
 1. Why do future methods always return void?
@@ -75,10 +82,10 @@ public class scheduler implements Schedulable{
 Can we call a future method from a future?
 No, it isn't possible. Chaining is only possible in Queueable.
 
- 5. Can we call batch from future ?
- Ans- No, We cannot call otherwise Fatal Error(System.AsyncException) error will occur.
- FATAL_ERROR System.AsyncException: Database.executeBatch cannot be called from a batch start,
- batch execute, or future method.
+5. Can we call batch from future ?
+- No, We cannot. If we do, we get the fatal error(System.AsyncException).
+FATAL_ERROR System.AsyncException: Database.executeBatch cannot be called from a batch start,
+batch execute, or future method.
 
 
  By making future methods static, Salesforce ensures that they maintain the necessary characteristics for safe and efficient asynchronous execution within the Salesforce platform.
@@ -129,11 +136,7 @@ We can’t call a future method from a future method. We will get a runtime erro
 We can only call one queueable and schedulable apex from a future method. 
 
 
-Limitations
 
-Cannot be monitored
-cannot pass sObject, List<sObject> as paramenters
-No more than 50 method calls per apex invocations.
 
 Can we pass wrapper to future method?
 
@@ -141,3 +144,7 @@ You can pass wrapper, but for that, you'll need to serialize/deserialize that
 parameter. You can convert the Wrapper to a String which is a primitive. Once
 converted into a String you can them pass that string as a parameter to the
 future method in consideration.
+
+CPU Time limit gets hit if a process takes more than 10 sec for synchronous and more than 60 sec for asynchronous. In a transaction, try to make things async, get rid of processes that aren’t immediately required → move it to a future method. 
+
+System.debug()  → also counted as CPU time limit usage.
