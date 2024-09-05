@@ -1,3 +1,8 @@
+/*
+* A wrapper class in an apex class with a collection of different data types.
+* It allows us to combine different data types and use them for specific purposes.
+*/
+
 public with sharing class AccWrapper {
     @AuraEnabled(cacheable=true)
     public static List<AccountWrapper> getAccountWithContact(){

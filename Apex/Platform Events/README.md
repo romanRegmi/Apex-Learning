@@ -1,17 +1,17 @@
-# Streaming API
+# Platform Events
 
-Streaming events are instant notification messages that one system(the publisher) sends to another (the subscriber).
+## Streaming APIs
+Streaming events are instant notification messages that one system (the publisher) sends to another (the subscriber).
 
-Streaming API - > Legacy : Generic & Push topic
-              - > Current : Platform Event and Change Data Capture (CDC)
+Streaming API 
+* Legacy : Generic & Push topic
+* Current : Platform Event and Change Data Capture (CDC)
 
 
 
 Streaming API vs Rest API
 
-* Using a REST API is sometimes compared to a conversation, while making requests with Streaming
-APIs is more like watching a film.
-
+* Using a REST API is sometimes compared to a conversation, while making requests with Streaming APIs is more like watching a film.
 * Client-server architecture based on requests and responses. 
 * connection is closed after response is recieved
 * statless (can be cached)
@@ -22,8 +22,7 @@ various response formats
 
 
 
-Streaming APIs are totally the opposite of REST APIs. They are simply a long-running request, left
-open, so data can be pushed into it.
+Streaming APIs are the opposite of REST APIs. They are a long-running request, left open, so that data can be pushed into it.
 
 presist connection with the streaming server based on long-running request and events.
 

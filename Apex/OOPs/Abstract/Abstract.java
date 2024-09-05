@@ -1,4 +1,6 @@
 /*
+ * An interface is a class in which none of the methods have been implemented.
+ * To use an interface, another class must implement it by providing a body for all of the methods contained in the interface.
  * An interface is private by default.
  * Methods in an interface are by default abstract.
  * Abstract methods must be implemented by the classes that extend it.

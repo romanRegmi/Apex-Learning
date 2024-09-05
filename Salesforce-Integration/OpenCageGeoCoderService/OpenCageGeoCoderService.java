@@ -1,8 +1,15 @@
-public with sharing class CurrencyAPIService {
-    public static void getExchangeRates(){
-        String COUNTRY = 'USD';
+public with sharing class OpenCageGeoCoderService {
+    public static void reverseGeoCoding(String accountId){
+        String OPENCAGE_API_URL = '';
+        String OPENCAGE_API_KEY = '';
+        Account accRec = [SELECT Id, Location_Latitude__s, Location_Longitude__s FROM Account
+                        WHERE Id=:accountId AND Location_Latitude__s != null AND Location_Longitude__s != null LIMIT 1];
+
+
+        String queryParams = accRec.Location_Latitude__s+','+accRec.Location_Longitude__s;
+
         HttpRequest httpReq = new HttpRequest();
-        httpReq.setEndPoint('https://open.er-api.com/v6/latests/' + COUNTRY); // URL must be added in the Remote Site Settings
+        httpReq.setEndPoint(OPENCAGE_API_URL+'?key='OPENCAGE_API_KEY+'&q='+queryParams+'&pretty=1'); // URL must be added in the Remote Site Settings
         
         
         httpReq.setHeader('Content-Type', 'application-json');

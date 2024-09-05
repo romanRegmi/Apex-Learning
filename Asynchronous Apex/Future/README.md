@@ -148,3 +148,7 @@ future method in consideration.
 CPU Time limit gets hit if a process takes more than 10 sec for synchronous and more than 60 sec for asynchronous. In a transaction, try to make things async, get rid of processes that aren’t immediately required → move it to a future method. 
 
 System.debug()  → also counted as CPU time limit usage.
+
+
+SetupObjects  --> User, UserRole etc
+Non Setup Objects --> Accounts, Leads, Custom__c

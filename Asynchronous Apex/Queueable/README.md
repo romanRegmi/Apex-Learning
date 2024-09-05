@@ -134,3 +134,7 @@ so easy.
 
 We cannot re-enqueue a job more than 5 times
 
+Max job in flex queue -> 100
+max job in execution stage --> 1
+
+batch apex max number of call outs --> From every method, we can make 100 callouts. The execute method is executed multiple times in a batch apex. So, for every time the method runs, we can make 100 call outs

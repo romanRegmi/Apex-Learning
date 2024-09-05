@@ -17,39 +17,7 @@ Limitations of Salesforce Apex
 SIZE() Method Will work only when Query has less than 200 Child records for each Parent.
 
 
-Use string.escapeSingleQuotes(qr); in dynamic SOQL. To prevent injection attack
 
-When applying field-level security in a SOQL query, don't use WITH SECURITY_ENFORCED rather use WITH USER_MODE.
-
-Here are the reasons
-
-- WITH SECURITY_ENFORCED is not applied for the fields used in the WHERE clause.
-- WITH SECURITY_ENFORCED is not applied for polymorphic fields (Owner, Task.WhatId, etc).
-- WITH SECURITY ENFORCED finds only the first error.
-
-
-If you have to enforce the FLS on data do not follow the legacy approach of using WITH SECURITY_ENFORCED.
-
-Rather, use the new addition to the framework which is WITH USER_MODE (or WITH SYSTEM_MODE).
-
-Here are the reasons.
-
-1. WITH SECURITY_ENFORCED does not apply to the fields in the WHERE clause.
-2. It does not apply to Polymorphic fields
-3. Throws exception the moment it encounters the first field the user does not have access to. If you want to show the list of all the fields the user does not have access to then this cannot be helpful.
-4. It cannot enforce sharing rules.
-​
-Likewise, using WITH USER_MODE can help us with all these cases.
-
-1. It applies to the fields in the WHERE class as well.
-2. It applies to polymorphic fields as well.
-3. This can capture all the fields that the user doesn't have access to, rather than throwing an exception the moment it encounters the first inaccessible field.
-4. This can enforce sharing rules. 
-
-Access Modifiers in Apex
-Private: Can be called inside the same class only.
-Public: Can be called inside another class also. 
-Protected : If a protected variable or method is declared in class A, the variable can be called in class B iff B extends class A. 
 
 🚀Some popular Salesforce errors and their resolutions :🚀
 
@@ -82,3 +50,9 @@ and best practices that will help you write efficient, scalable code. Check our 
 8. Exception Handling in Apex Code
 9. Write One Trigger per Object per event
 10. Use Asynchronous Apex
+
+
+When using the with sharing keyword you are enforcing record access, unlike the WITH_SECURITY_ENFORCED clause which is used to enforce Field and Object level security.
+
+
+NOTE : Salesforce may update functionalities and limitations in every release. Therefore, we must also refer to the official documentation regarding most of what is presented here. 

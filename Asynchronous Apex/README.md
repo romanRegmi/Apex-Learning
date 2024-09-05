@@ -44,6 +44,7 @@ Q. Can you change order of job in Apex Flex Queue?
 Jobs are processed first-in first-out-in the order in which they're submitted. You can look at the current queue order and shuffle the queue, so that you could move an important job to the front, or less important ones to the back.
 ```apex
 Boolean isSuccess = System.FlexQueue.moveBeforeJob(jobToMoveId, jobInQueueId);
+```
 
 
 Every asynchronous operation has two forms of memory. Apex queue and flex queue. 

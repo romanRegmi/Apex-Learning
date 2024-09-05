@@ -1,10 +1,14 @@
 # Batch Apex
-Batch Apex is a powerful Salesforce feature that allows you to process large jobs efficiently. It's designed to handle thousands or even millions of records, making it ideal for data cleansing, archiving, or any operation that requires the processing of a massive amount of data. The max number of batch executions is 250000 per day.
+Batch Apex is a powerful Salesforce feature that allows you to process large jobs efficiently. It's designed to handle thousands or even millions of records, making it ideal for data cleansing, archiving, or any operation that requires the processing of a massive amount of data. The max number of batch executions is 2,50,000 per day.
 
 ## Key Features
 * Batch Apex processes records asynchronously in batches.
 * Each batch is processed using the same execution logic defined in the batch class.   
 * Batch Apex is an excellent solution when dealing with large datasets, as it can break down the job into manageable chunks.
+
+## Types of batch apex
+1. Query Locator
+2. Iterator
 
 ## Advantages
 1. Governor Limits: Each batch execution starts with a new set of governor limits, providing better control over resource usage.
@@ -20,10 +24,11 @@ A Batch Apex class must implement the Database.Batchable interface and include t
 
 3. finish: The `finish` method executes post-processing operations, such as sending emails, once all batches are processed.
 
-```apex
+```java
 public class MyBatch implements Database.Batchable<sObject> {
     public Database.QueryLocator start(Database.BatchableContext bc) {
         // Collect the batches of records or objects to be passed to the execute method
+        return Database.getQueryLocator('SELECT Id FROM Account');
     }
 
     public void execute(Database.BatchableContext bc, List<sObject> records) {
@@ -35,6 +40,17 @@ public class MyBatch implements Database.Batchable<sObject> {
     }
 }
 ```
+
+## Life Cycle of a Batch Apex Class
+Life Cycle of Batch Apex (Status of jobs in the Apex Flex Queue)
+
+1. Holding : Job has been submitted and is held in the Apex flex queue until system resources become available to queue the job for processing.
+2. Queued : Job is awaiting execution.
+3. Preparing : The start method of the job has been invoked. This status can last a few minutes depending on the size of the batch of records.
+4. Processing : Job is being processed.
+5. Aborted : Job aborted by a user.
+6. Completed : Job completed with or without failures.
+7. Failed : Job experienced a system failure.
 
 ## Invoking a batch class
 ```apex
@@ -58,65 +74,34 @@ Each Batch Apex invocation creates an `AsyncApexJob` record, which helps track t
 AsyncApexJob job = [SELECT Id, Status, JobItemsProcessed, TotalJobItems, NumberOfErrors FROM AsyncApexJob WHERE ID = :batchId];
 ```
 
-## Life Cycle of a Batch Apex Class
-Life Cycle of Batch Apex (Status of jobs in the Apex Flex Queue)
-
-1. Holding: - Job has been submitted and is held in the Apex flex queue until system resources become available to queue the job for processing.
-2. Queued : - Job is awaiting execution.
-3. Preparing: - The start method of the job has been invoked. This status can last a few minutes depending on the size of the batch of records.
-4. Processing: - Job is being processed.
-5. Aborted: - Job aborted by a user.
-6. Completed: - Job completed with or without failures.
-7. Failed: - Job experienced a system failure.
-
 # Interview Questions
 
-1. Explain the different interfaces of a batch class?
- - Database.Batchable : (Mandatory)
+1. <b>Explain the different interfaces of a batch class?</b>
+    - Database.Batchable : (Mandatory)
 
- - Database.AllowsCallout : This interface allows the batch job to make outbound calls (callouts) to external services. It's crucial to annotate your batch class with this interface if you intend to make callouts within the execute method. Remember, callouts introduce additional governor limits and require careful handling of potential errors.
+    - Database.AllowsCallout : This interface allows the batch job to make outbound calls (callouts) to external services. It's crucial to annotate your batch class with this interface if you intend to make callouts within the execute method. Remember, callouts introduce additional governor limits and require careful handling of potential errors.
 
- - Database.Stateful: This interface enables you to maintain state information between batches during the execution of your batch job. It's particularly useful when you need to track or accumulate data throughout the processing of multiple batches. However, use this interface cautiously as it can impact performance and governor limits due to the need for additional data storage during the batch job.
+    - Database.Stateful: This interface enables you to maintain state information between batches during the execution of your batch job. It's particularly useful when you need to track or accumulate data throughout the processing of multiple batches. However, use this interface cautiously as it can impact performance and governor limits due to the need for additional data storage during the batch job.
 
- - System.Iterator : //TODO
+    - System.Iterator : //TODO
 
- - System.Schedulable : //TODO
-
-
-
-2. Can we call future from batch ?
-Ans- No, we cannot call otherwise Fatal error(System.AsyncException) error will occur.
+    - System.Schedulable : //TODO
 
 
 
-In Salesforce, when you want to process data from a CSV file in a Batch class, it's generally more appropriate to use the `Database.Batchable` interface rather than `Iterable`. Here's why:
+2. <b>Can we call future from batch ?</b>
+    - No, we get the Fatal error(System.AsyncException).
 
-    1. **Scalability**: `Database.Batchable` is designed for processing large volumes of data efficiently. It allows you to divide the data into manageable chunks (batches), making it suitable for handling CSV files with a significant number of records.
+3. <b>Can I add a additional method in a batch class?</b>
 
-    2. **Governor Limits**: Batch jobs that implement `Database.Batchable` have separate governor limits from synchronous transactions, which provides flexibility for processing large datasets without hitting the same limits.
+    - Yes, you can add additional methods to a batch class, as long as you follow the basic structure and syntax requirements of a batch class. 
+    
+        However, keep in mind that any additional methods you add to a batch class should not interfere with the standard functionality of the batch class. The main entry point of a batch class is the execute() method, which is called when the batch job is started, so any additional methods should not interfere with this method.
 
-    3. **Error Handling**: `Database.Batchable` provides better error handling capabilities. You can track and manage failed records, which is essential when dealing with data from external sources like CSV files.
+        Additionally, if you plan to use any additional methods in your batch class from outside the class (for example, in a test class), make sure to mark them as public so they can be accessed from other classes.
 
-    4. **Asynchronous Processing**: Batch jobs can run asynchronously, freeing up system resources and allowing users to continue working without waiting for data processing to complete.
-
-    5. **Automatic Checkpointing**: `Database.Batchable` automatically handles checkpointing, which is useful for resuming processing if the batch job is interrupted or needs to be rerun.
-
-To use `Database.Batchable` with a CSV file, you typically load the CSV data into a custom or standard object in Salesforce (e.g., using `Batchable`'s `start` method to query the CSV data) and then process it in batches.
-
-On the other hand, `Iterable` is more suitable when you have a relatively small amount of data to process and can load the data directly from a collection or an external source without the need for dividing it into batches. It's typically used for in-memory processing of data rather than processing large datasets from external files like CSV.
-
-
-
-3. Can I add a additional method in a batch class?
-
-Yes, you can add additional methods to a batch class, as long as you follow the basic structure and syntax requirements of a batch class.
-
-However, keep in mind that any additional methods you add to a batch class should not interfere with the standard functionality of the batch class. The main entry point of a batch class is the execute() method, which is called when the batch job is started, so any additional methods should not interfere with this method.
-
-Additionally, if you plan to use any additional methods in your batch class from outside the class (for example, in a test class), make sure to mark them as public so they can be accessed from other classes.
-
-4. Can we call a batch class from another batch class?
-Yes, we can call batch apex from batch apex in finally.
+4. <b>Can we call a batch class from another batch class?</b>
+    - Yes, we can call batch apex from batch apex in finally.
 
 5. Can we call the batch apex from triggers in salesforce?
 
@@ -211,7 +196,7 @@ be added in one go.
 
 Q. How can you stop a Batch job?
 
-The Database.executeBatch and System.scheduleBatch method returns an ID
+The Database.executeBatch and System.scheduleBatch method returns an Id
 that can be used in System.abortJob method.
 
 Q. Can I query related records using Database.QueryLocator?
@@ -251,57 +236,42 @@ Batch Apex is stateless by default. That means for each execution of your execut
 global class SummarizeAccountTotal implements Database.Batchable<sObject>{
 }
 
+In Salesforce, when you want to process data from a CSV file in a Batch class, it's generally more appropriate to use the `Database.Batchable` interface rather than `Iterable`. Here's why:
 
-start
+    1. **Scalability**: `Database.Batchable` is designed for processing large volumes of data efficiently. It allows you to divide the data into manageable chunks (batches), making it suitable for handling CSV files with a significant number of records.
 
-. Collect the records or objects to be passed to the interface method
-execute for processing.
-. start method is called once at the beginning of a Batch Apex Job.
-. It returns a Database.QueryLocator object or an Iterable that
-contains the records or objects passed to the job.
-. When QueryLocator object is used, the governor limit for the total
-number of records retrieved by SOQL queries is bypassed and 50
-million records can be queried. .
-. Whereas with an Iterable, governor limit by SOQL queries is
-enforced.
+    2. **Governor Limits**: Batch jobs that implement `Database.Batchable` have separate governor limits from synchronous transactions, which provides flexibility for processing large datasets without hitting the same limits.
 
-execute
+    3. **Error Handling**: `Database.Batchable` provides better error handling capabilities. You can track and manage failed records, which is essential when dealing with data from external sources like CSV files.
 
-. Performs actual processing for each batch of data passed.
-· Default batch size is 200 records.
-. Batches of records can execute in any order, it doesn't
-depends on which order they are received from the start
-method.
-. It takes a reference to the Database.BatchableContext object
-and A List<sObject> or a list of parameterized types.
-. When using Database.QueryLocator use the returned list.
+    4. **Asynchronous Processing**: Batch jobs can run asynchronously, freeing up system resources and allowing users to continue working without waiting for data processing to complete.
+
+    5. **Automatic Checkpointing**: `Database.Batchable` automatically handles checkpointing, which is useful for resuming processing if the batch job is interrupted or needs to be rerun.
+
+To use `Database.Batchable` with a CSV file, you typically load the CSV data into a custom or standard object in Salesforce (e.g., using `Batchable`'s `start` method to query the CSV data) and then process it in batches.
+
+On the other hand, `Iterable` is more suitable when you have a relatively small amount of data to process and can load the data directly from a collection or an external source without the need for dividing it into batches. It's typically used for in-memory processing of data rather than processing large datasets from external files like CSV.
+
+What are the different interface that we can use with batch apex?
+1. Database.AllowsCallouts
+2. Database.Statefull
+3. System.Schedulable
+4. System.Iterator
+5. Database.Batchabe<sObject>
+
+Database.Batchable
+Implement this interface when wanted to create
+an apex batch which will provide the 3 methods.
+(Start, execute, finish)
+Database.Stateful
+Implement this method whenever you wanted to
+hold the value of variables throughout the
+transaction. For example to get the list of success
+and failed record
+Database.AllowsCallout
+To make the API callout from apex batch
+System.Iterator
+Create the Custom Iterator batch.
 
 
-
-finish
-
-· Execute post-processing operations.
-. Calls once after all batches are processed.
-. For example, sending an email process can be implemented
-in finish method.
-
-
-
-Invoke a Batch Class
-
-MyBatch myBatchObj = new MyBatch( );
-Id batchld = Database.executeBatch(myBatchObj);
-
-Pass Batch Size if needed:
-
-Id batchld = Database.executeBatch(myBatchObj, 100);
-
-AsyncApexJob Record
-
-. Each Batch Apex invocation creates an AsyncApexJob
-record.
-. It helps to track progress of the job.
-
-AsyncApexJob job = [SELECT Id, Status, JobltemsProcessed,
-TotalJobltems, NumberOfErrors FROM AsyncApexJob WHERE
-ID = :batchld ];
+The default size of a batch apex is 200. The max is 2000 and the min is 1 when implementing the QueryLocator. In case of System Iterator, we don't have a limitation. 
