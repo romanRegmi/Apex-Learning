@@ -275,3 +275,15 @@ Create the Custom Iterator batch.
 
 
 The default size of a batch apex is 200. The max is 2000 and the min is 1 when implementing the QueryLocator. In case of System Iterator, we don't have a limitation. 
+
+
+It depends on your need , if you want to run batch on records that can be filtered by SOQL then QueryLocator is preferable, but if records that you want to bee processed by batch can not be filtered by SOQL then you will have to use iteratable. But most of the cases it will be achieved  by query locator , so query locator is preferable so just try with it if you scope is complex and can not be achieved by SOQL then go with iterable.
+
+Iterable --> governor limit is enforced. We can perform some custom logic and then pass the data to execute. We can't do this with querylocator.
+
+The limit for a QueryLocator is 50,000,000 records, the maximum size for any query (including API-based SOQL calls). The there is no hard limit for Iterable, though you're still limited by both CPU time (limit 60,000 ms/1 minute) and total start time (10 minutes); in practice, it might be hard to get up to even 50 million rows in that time, but it is likely theoretically possible.
+
+In addition, Iterable return types have no hard maximum scope size, unlike QueryLocator, which will not allow more than 2,000 records per execute call. Other limits may limit how many items you can actually process (e.g. heap or CPU time), but there's no inherent hard limit for scope size.
+
+Hypothetically speaking, using Iterable, you could process 100,000,000 items, or more, assuming you can somehow generate that many items in the time allotted.
+

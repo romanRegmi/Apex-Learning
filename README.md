@@ -55,4 +55,76 @@ and best practices that will help you write efficient, scalable code. Check our 
 When using the with sharing keyword you are enforcing record access, unlike the WITH_SECURITY_ENFORCED clause which is used to enforce Field and Object level security.
 
 
-NOTE : Salesforce may update functionalities and limitations in every release. Therefore, we must also refer to the official documentation regarding most of what is presented here. 
+NOTE : Salesforce may update functionalities and limitations in every release. Therefore, we must also refer to the official documentation regarding most of what is presented here.
+
+In Salesforce development, ensuring data security and proper permissions are essential to maintaining the integrity and confidentiality of your data. Three key methods to enforce security are isAccessible(), with User Mode, and with SECURITY_ENFORCED. This article provides a detailed comparison of these methods, exploring their use cases, advantages, and limitations.
+
+1. Using isAccessible()
+Overview
+isAccessible() is a method used to check if the current user has access to a specific field on an SObject. This method is part of the Salesforce schema class and is used extensively in Apex code to ensure field-level security.
+
+Usage
+To use isAccessible(), you need to perform an explicit check before accessing the field value. This method returns a Boolean value indicating whether the field is accessible.
+
+Example:
+
+if (Schema.SObjectType.Account.fields.Name.isAccessible()) {
+String accountName = myAccount.Name;
+}
+Pros
+Granular Control: isAccessible() provides fine-grained control over field-level security, allowing you to check permissions on a per-field basis.
+Flexibility: It can be used in various contexts, including triggers, controllers, and batch classes.
+Explicit Security Checks: By using isAccessible(), developers can ensure that security checks are explicitly performed, making the code’s intent clear.
+Cons
+Verbosity: Requires explicit checks for each field access, which can lead to verbose and cluttered code.
+Potential for Human Error: Since each field access needs to be checked manually, there is a risk of missing some checks, leading to potential security vulnerabilities.
+2. Using with User Mode
+Overview
+with User Mode is a keyword used in Salesforce SOQL and SOSL queries to ensure that all field- and object-level security is enforced when accessing data. This mode ensures that the query results only include data that the current user is permitted to see.
+
+Usage
+with User Mode is appended to a SOQL or SOSL query to enforce security rules automatically.
+
+Example:
+
+List<Account> accounts = [SELECT Name FROM Account WITH USER_MODE];
+Pros
+Automatic Enforcement: Automatically enforces security rules, reducing the likelihood of missing checks.
+Simplifies Code: Removes the need for explicit security checks, resulting in cleaner and more maintainable code.
+Consistent Security: Ensures that all queries respect the user’s permissions consistently.
+Cons
+Limited Scope: Only applicable to SOQL and SOSL queries, so it cannot be used in all code contexts.
+Less Granular Control: Does not provide the same level of granular control as isAccessible() for field-level security checks outside of queries.
+3. Using with SECURITY_ENFORCED
+Overview
+with SECURITY_ENFORCED is a clause that can be added to SOQL queries to enforce both field- and object-level security. It ensures that the query respects the security settings configured in the Salesforce org.
+
+Usage
+with SECURITY_ENFORCED is appended to a SOQL query to enforce security rules automatically.
+
+Example:
+
+List<Account> accounts = [SELECT Name FROM Account WITH SECURITY_ENFORCED];
+Pros
+Comprehensive Security: Ensures that both field- and object-level security are enforced, providing a robust security mechanism.
+Automatic Enforcement: Similar to with User Mode, it automatically applies security checks, reducing the risk of human error.
+Simplifies Code: Helps keep the code clean and maintainable by removing the need for explicit security checks.
+Cons
+Limited Scope: Only applicable to SOQL queries, so it cannot be used for non-query contexts.
+Less Flexibility: Does not provide control over individual field-level security checks outside of queries.
+Comparison Summary
+
+Recommendation
+For comprehensive security coverage and minimal risk of missing checks, it is often best to combine the use of isAccessible() with with SECURITY_ENFORCED. This approach ensures that both field-level and object-level security are consistently enforced:
+
+Use isAccessible() for field-level security checks in non-query contexts.
+Use with SECURITY_ENFORCED in SOQL queries to automatically enforce security rules.
+Combined Example:
+
+if (Schema.SObjectType.Account.fields.Name.isAccessible()) {
+List<Account> accounts = [SELECT Name FROM Account WITH SECURITY_ENFORCED];
+for (Account acc : accounts) {
+// Process account
+}
+}
+By combining these methods, you can create a robust security framework that protects your Salesforce data and adheres to best practices, ensuring compliance and reducing vulnerabilities in your org.

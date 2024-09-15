@@ -28,18 +28,13 @@ Here are the reasons
 - WITH SECURITY_ENFORCED is not applied for the fields used in the WHERE clause.
 - WITH SECURITY_ENFORCED is not applied for polymorphic fields (Owner, Task.WhatId, etc).
 - WITH SECURITY ENFORCED finds only the first error.
+4. It cannot enforce sharing rules.
 
 
 If you have to enforce the FLS on data do not follow the legacy approach of using WITH SECURITY_ENFORCED.
 
 Rather, use the new addition to the framework which is WITH USER_MODE (or WITH SYSTEM_MODE).
 
-Here are the reasons.
-
-1. WITH SECURITY_ENFORCED does not apply to the fields in the WHERE clause.
-2. It does not apply to Polymorphic fields
-3. Throws exception the moment it encounters the first field the user does not have access to. If you want to show the list of all the fields the user does not have access to then this cannot be helpful.
-4. It cannot enforce sharing rules.
 ​
 Likewise, using WITH USER_MODE can help us with all these cases.
 
@@ -50,8 +45,7 @@ Likewise, using WITH USER_MODE can help us with all these cases.
 5. The WITH USER_MODE supports lots of new innovations like restriction rules, scoping rules, and any other security operations for data access and CRUD/FLS that may be added by the platform in the future.
 
 
-If any of the fields or objects access is not there for the user, then a query Exception is thrown. No data is returned.  If you want partial data to be returned, then use the following
-
+If any of the fields or objects access is not there for the user, then a query Exception is thrown. No data is returned.
 
 
 
