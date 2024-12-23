@@ -22,7 +22,7 @@ for (DescribeTabSetResult tsr : tabSetDesc) {
         // Create a new custom object tab
         MetadataService.CustomTab customTab = new MetadataService.CustomTab();
         customTab.fullName = customObjectName;
-        customTab.label = customObjectName.removeEnd('__c').replace('_', ');
+        customTab.label = customObjectName.removeEnd('__c').replace('_', '');
         customTab.mobileReady = true;
         customTab.sobjectName = customObjectName;
         customTab.availability = 'Both';
