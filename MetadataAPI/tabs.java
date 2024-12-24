@@ -68,7 +68,7 @@ private static void handleSaveResults(MetadataService.SaveResult saveResult) {
                     'ields ' String.join(error.fields, ',') + '.' : '' ) );
         }
         if (messages.size() > 0) {
-            throw new MetadataServiceException(String.join(messages, '));
+            throw new MetadataServiceException(String.join(messages, ''));
         }
     }
     if (!saveResult.success) {
@@ -78,3 +78,65 @@ private static void handleSaveResults(MetadataService.SaveResult saveResult) {
 
 // Custom exception class
 public class MetadataServiceException extends Exception { }
+
+
+
+
+public class tabCreation {
+    
+    public static Boolean doesTabExist(String objectAPIName){
+        // Get the current list of tabs
+        List<Schema.DescribeTabSetResult> tabSetDesc = Schema.describeTabs();
+        
+        
+        boolean tabExists = false;
+        // Iterate through the tab sets
+        for (DescribeTabSetResult tsr : tabSetDesc) {
+            // Get the tabs for the current tab set
+            List<Schema.DescribeTabResult> tabDesc = tsr.getTabs();
+        
+            // Check if the custom object tab already exists
+            for (DescribeTabResult tr : tabDesc) {
+                if (tr.getSobjectName() == objectAPIName) {
+                    tabExists = true;
+                }
+            }
+        }
+        
+        return tabExists;
+        
+        
+    }
+    
+    
+    public static void createTab(String objectAPIName){
+        MetadataService.CustomTab customTab = new MetadataService.CustomTab();
+        customTab.fullName = objectAPIName;
+        customTab.label = objectAPIName.removeEnd('__c').replace('_', ' ');
+        customTab.mobileReady = true;
+        customTab.customObject = true;
+        customTab.motif = 'Custom20:Airplane';
+        
+        // Add the custom tab to the list of tabs
+        MetadataService.MetadataPort service = createService();
+        try{
+        List<MetadataService.SaveResult> results =
+            service.createMetadata(
+                new MetadataService.Metadata[] { customTab });
+            
+            //System.assert(false, results);
+        } catch(Exception ex){
+            System.assert(false, ex);
+        }
+    }
+    
+    // Method to create a MetadataService instance
+    private static MetadataService.MetadataPort createService() {
+        MetadataService.MetadataPort service = new MetadataService.MetadataPort();
+        service.SessionHeader = new MetadataService.SessionHeader_element();
+        service.SessionHeader.sessionId = UserInfo.getSessionId();
+        return service;
+    }
+    
+
+}
