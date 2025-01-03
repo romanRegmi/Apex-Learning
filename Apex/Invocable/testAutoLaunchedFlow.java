@@ -1,4 +1,4 @@
-@IsTest
+@isTest
 public class testAutoLaunchedFlow {
     public testMethod static void testAutoLaunchedFlowMethod(){        
         Object__A objA = new Object__A(Name = 'Supplier 01', Type__c = 'Supplier');
@@ -14,6 +14,6 @@ public class testAutoLaunchedFlow {
         actionFlow.start();
         
         Object__B result = (Object__B) actionFlow.getVariableValue('outRecord'); // outRecord variable is defined in flow as an output variable.
-        System.assertEquals();           
+        System.assertEquals();        
     }
 }

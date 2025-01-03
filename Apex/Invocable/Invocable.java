@@ -8,7 +8,7 @@
 * The running user must have the corresponding Apex class enabled in their profile or permission set.
 */
 
-/* Limitations for each flow interview.
+/* Limitations of flow.
 * SOQL Query Limit is 100 which is same as Single Transaction in sync Apex.
 * Only 150 DML Statements can be used in a Single flow including all the Sub-Flows.
 * CPU timeout is same as 10 seconds.
@@ -71,7 +71,3 @@ public class DateClassUtility {
         public Integer numberOfDays;
     }
 }
-
-
-
-

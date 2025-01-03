@@ -1,6 +1,6 @@
 /*
 * ?. safe navigation : if not null then only take BillingCity
-* ?? This is used for assignment - if not null aninteger else 100
+* ?? This is used for assignment - if not null an integer else 100
 */
 
 Integer notNullReturnValue = anInteger ?? 100;
