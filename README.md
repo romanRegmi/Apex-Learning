@@ -128,3 +128,27 @@ for (Account acc : accounts) {
 }
 }
 By combining these methods, you can create a robust security framework that protects your Salesforce data and adheres to best practices, ensuring compliance and reducing vulnerabilities in your org.
+
+
+
+In Salesforce, the ContentDocumentLink object is used to associate a content document (such as a file or attachment) with another Salesforce object. The ContentDocumentLink object has two important fields related to access control: ShareType and Visibility. Here's a breakdown of the differences between these two fields:
+
+ShareType
+Definition: The ShareType field specifies the level of access that an entity (such as a user or group) has to a content document via the link.
+Values:
+V (Viewer): The user or group can view the document but cannot make changes.
+C (Collaborator): The user or group can both view and edit the document.
+I (Inferred Read): Indicates that the user's access to the document is inferred by an existing permission model. This means the access is determined by the sharing rules or hierarchy.
+P (Inferred Edit): Similar to I, but implies inferred edit permissions.
+Use Case: Use ShareType to control the access rights (view or edit) of the document for different users or groups.
+Visibility
+Definition: The Visibility field governs the access level of the content document to the users who have access to the linked object.
+Values:
+AllUsers: The document is visible to all users who have access to the linked record.
+InternalUsers: The document is only visible to internal users. This setting hides the document from external users, even if the external user has access to the linked record.
+SharedUsers: The document is visible to users who have been explicitly granted access.
+Use Case: Use Visibility to control the exposure of the document in contexts such as external sharing scenarios or when certain documents should only be visible to a subset of users who can access the associated record.
+Summary
+ShareType is primarily concerned with the permissions related to viewing or editing the document itself.
+Visibility affects who among those with access to the linked record can see the document in the first place.
+These fields allow you to finely tune who can see and interact with documents linked to records in Salesforce, supporting a range of sharing and collaboration scenarios.
