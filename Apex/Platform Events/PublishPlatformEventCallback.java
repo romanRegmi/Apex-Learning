@@ -1,4 +1,4 @@
-public with sharing class PublishPlatformEventCallback implements EventBus.EventPublishSuccessCallback, EventBus.EventPublishFailureCallback{
+public with sharing class PublishPlatformEventCallback implements EventBus.EventPublishSuccessCallback, EventBus.EventPublishFailureCallback {
     public void onSuccess(EventBus. SuccessResult result) {
         List<String> EventUUILDList = result.getEventUuids();
     }

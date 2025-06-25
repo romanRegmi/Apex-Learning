@@ -58,7 +58,7 @@ futureMethodExample.MyFutureMethod1();
 }
 }
 
-Q. I have 200 records to be processed using Queueable Apex, How Can I divide theexecution Context for every 100 records?
+Q. I have 200 records to be processed using Queueable Apex, How Can I divide the execution Context for every 100 records?
 Similar to future jobs, queueable jobs don't process batches, so you can't divide the execution Context. It will process all 200 records, in a single execution Context 
 
 
@@ -138,3 +138,10 @@ Max job in flex queue -> 100
 max job in execution stage --> 1
 
 batch apex max number of call outs --> From every method, we can make 100 callouts. The execute method is executed multiple times in a batch apex. So, for every time the method runs, we can make 100 call outs
+
+
+Advantage of queueable apex
+
+- directly pass sobject or a list of sobject
+- chain the job
+- query jobid and check its status

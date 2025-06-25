@@ -259,19 +259,13 @@ What are the different interface that we can use with batch apex?
 4. System.Iterator
 5. Database.Batchabe<sObject>
 
-Database.Batchable
-Implement this interface when wanted to create
-an apex batch which will provide the 3 methods.
-(Start, execute, finish)
-Database.Stateful
-Implement this method whenever you wanted to
-hold the value of variables throughout the
-transaction. For example to get the list of success
-and failed record
-Database.AllowsCallout
-To make the API callout from apex batch
-System.Iterator
-Create the Custom Iterator batch.
+Database.Batchable : Implement this interface when wanted to create an apex batch which will provide the 3 methods. (Start, execute, finish)
+
+Database.Stateful : Implement this method whenever you wanted to hold the value of variables throughout the transaction. For example to get the list of success and failed record
+
+Database.AllowsCallout : To make the API callout from apex batch
+
+System.Iterator : Create the Custom Iterator batch.
 
 
 The default size of a batch apex is 200. The max is 2000 and the min is 1 when implementing the QueryLocator. In case of System Iterator, we don't have a limitation. 
@@ -287,3 +281,11 @@ In addition, Iterable return types have no hard maximum scope size, unlike Query
 
 Hypothetically speaking, using Iterable, you could process 100,000,000 items, or more, assuming you can somehow generate that many items in the time allotted.
 
+all the queried record of a batch class will be of a single batch
+
+
+The limit for a QueryLocator is 50,000,000 records, the maximum size for any query (including API-based SOQL calls). The there is no hard limit for Iterable, though you're still limited by both CPU time (limit 60,000 ms/1 minute) and total start time (10 minutes); in practice, it might be hard to get up to even 50 million rows in that time, but it is likely theoretically possible.
+
+In addition, Iterable return types have no hard maximum scope size, unlike QueryLocator, which will not allow more than 2,000 records per execute call. Other limits may limit how many items you can actually process (e.g. heap or CPU time), but there's no inherent hard limit for scope size.
+
+Hypothetically speaking, using Iterable, you could process 100,000,000 items, or more, assuming you can somehow generate that many items in the time allotted.

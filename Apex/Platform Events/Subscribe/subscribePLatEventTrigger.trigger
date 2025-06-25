@@ -3,6 +3,6 @@
 
 trigger subscribePlatformEventTrigger on Order_Detail__e(after insert) {
     if (Trigger.isAfter && Trigger.isInsert) {
-    subscribePlatformEvent.afterInsert(trigger.new);
+        subscribePlatformEvent.afterInsert(trigger.new);
     }
 }
