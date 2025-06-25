@@ -37,16 +37,92 @@ The SOLID principles are a set of five design principles that help guide softwar
    **Example:**
    In a messaging system, the high-level module (e.g., the application logic) should not directly depend on the low-level module (e.g., the specific messaging API). Instead, both should depend on an abstraction (interface or abstract class) that defines how communication should occur.
 
-Applying these SOLID principles can lead to more maintainable, scalable, and adaptable software, making it easier to understand, extend, and modify the codebase over time.
-
-
-// Open/Closed Principle : Software entities(classes, modules, functions, etc) should be open for extension, but closed (as little changes as possible) for modification. 
 
 
 
-//LISKOV SUBSTITUTION PRINCIPLE : All subclasses of a super class need to be able to implement all the super class methods without an error occuring.
+   key difference between ISP and SRP
+Key differences:
+
+Scope: SRP focuses on class responsibilities, while ISP focuses on interface design
+Purpose: SRP aims to achieve high cohesion, while ISP aims to achieve loose coupling
+Level: SRP operates at the class implementation level, while ISP operates at the interface level
 
 
-// INTERFACE {OOP interface not UI} SEGREGATION PRINCIPLE : "ONLY MAKE YOUR CODE DEPEND ON WHAT IT TRULY NEEDS TO DEPEND ON"
+```apex
+// BEFORE - Violating both SRP and ISP
+interface DocumentHandler {
+    void readDocument();
+    void writeDocument();
+    void printDocument();
+    void scanDocument();
+    void faxDocument();
+    void emailDocument();
+}
 
-THE GOAL IS TO SEPARATE THE DETAILS (UI, BATCH CLASSES, ETC) FROM THE CONCRETE HIGH LEVEL IMPLEMENTATIONS (TYPICALLY SERVICE CLASSES/BUSINESS LOGIC)
+class PrinterScanner implements DocumentHandler {
+    // Has to implement ALL methods, even though it can only print and scan
+    public void readDocument() { throw new UnsupportedOperationException(); }
+    public void writeDocument() { throw new UnsupportedOperationException(); }
+    public void printDocument() { /* Can do this */ }
+    public void scanDocument() { /* Can do this */ }
+    public void faxDocument() { throw new UnsupportedOperationException(); }
+    public void emailDocument() { throw new UnsupportedOperationException(); }
+}
+
+// AFTER - Following both SRP and ISP
+// Split interfaces based on specific roles (ISP)
+interface Printable {
+    void print();
+}
+
+interface Scannable {
+    void scan();
+}
+
+interface Emailable {
+    void email();
+}
+
+interface Faxable {
+    void fax();
+}
+
+// Classes with single responsibilities (SRP)
+class Printer implements Printable {
+    public void print() {
+        // Only printing logic here
+    }
+}
+
+class Scanner implements Scannable {
+    public void scan() {
+        // Only scanning logic here
+    }
+}
+
+// A multifunction device can implement multiple focused interfaces
+class MultifunctionPrinter implements Printable, Scannable {
+    public void print() {
+        // Printing logic
+    }
+    
+    public void scan() {
+        // Scanning logic
+    }
+}
+
+// Usage example
+class DocumentWorkflow {
+    private final Printable printer;
+    private final Scannable scanner;
+    
+    public DocumentWorkflow(Printable printer, Scannable scanner) {
+        this.printer = printer;
+        this.scanner = scanner;
+    }
+    
+    public void processDocument() {
+        scanner.scan();
+        printer.print();
+    }
+}

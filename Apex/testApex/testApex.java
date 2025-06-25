@@ -100,3 +100,10 @@ public class MyTestClass {
 
 
 The @TestVisible annotation in Salesforce is used to increase the visibility of private class members in test methods. Normally, private members of a class are not accessible outside of that class. However, when you apply the @TestVisible annotation to a private class member, it becomes accessible to Test Classes.
+
+
+Best practices
+- bulk test
+- create test records and don't use org records
+- use factory class
+- positive test as well as negative test

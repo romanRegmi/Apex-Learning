@@ -47,7 +47,7 @@ Boolean isSuccess = System.FlexQueue.moveBeforeJob(jobToMoveId, jobInQueueId);
 ```
 
 
-Every asynchronous operation has two forms of memory. Apex queue and flex queue. 
+Every asynchronous operation has two forms of memory. Apex queue and Flex queue. 
 
 1. **Apex Job Queue**:
    - The Apex Job Queue, commonly referred to as the "Queueable Apex," allows you to asynchronously process long-running or computationally expensive operations in Salesforce. This feature is useful when you want to offload tasks that could potentially exceed execution time limits in synchronous contexts.
@@ -84,3 +84,10 @@ Salesforce only recommends us to schedule our batches. Otherwise, it is advised 
 You can also monitor the status of Apex jobs in the Apex Flex Queue, and reorder them to control which jobs are processed first. From Setup, enter Jobs in the Quick Find box, then select Apex Flex Queue.
 
 Async processes will be available in Quick Find → Apex Jobs
+
+
+It is possible we have to implements Databases.Batchable<sObject>, Queueable, Schedulable
+
+
+
+50 Queable chain jobs in one transaction. Parent can only have 1 
