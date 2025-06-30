@@ -27,8 +27,3 @@ Interface: Cannot have properties or variables
 
 
 Abstract method is acts like a template and has no logic in it. Any subclass needs to implement its methods. Whereas a virtual class has a default implementation for its methods which can be overriden by subclass. An abstract class can have a virtual method and a virtual class can have an abstract method.
-
-
-// Created date should be yesterday for a test class method. 
-
-Test.setCreatedDate(recordId, RequiredcreatedDatetime)

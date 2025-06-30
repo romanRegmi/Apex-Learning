@@ -107,3 +107,6 @@ Best practices
 - create test records and don't use org records
 - use factory class
 - positive test as well as negative test
+
+// Created date should be yesterday for a test class method. 
+Test.setCreatedDate(recordId, RequiredcreatedDatetime)

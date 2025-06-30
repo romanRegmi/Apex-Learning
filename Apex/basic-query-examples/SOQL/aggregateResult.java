@@ -42,9 +42,3 @@ List<Account> acc = [SELECT Name FROM Account WHERE Name Like 'GenePoint'];
 List<Account> acc = [SELECT Name FROM Account WHERE Name Like 'GenePoint'];
 List<Account> acc = [SELECT Name FROM Account WHERE Name Like '%GenePoint%'];
 List<Account> acc = [SELECT Name FROM Account WHERE Name Like '_GenePoint'];
-
-
-
-
-
-

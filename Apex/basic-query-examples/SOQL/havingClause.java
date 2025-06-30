@@ -1,10 +1,9 @@
-
-Limitations:
-
-Can't use HAVING without GROUP BY
-Can't reference individual records
-Must use aggregate functions or GROUP BY fields
-
+/*
+* Limitations: 
+*      Can't use HAVING without GROUP BY
+*      Can't reference individual records
+*      Must use aggregate functions or GROUP BY fields
+*/
 
 // 1. Basic HAVING with COUNT
 SELECT AccountId, COUNT(Id) totalOpportunities
@@ -83,35 +82,3 @@ WHERE Account.IsActive = true
 GROUP BY Account.Type, Account.Industry
 HAVING COUNT(Id) > 10
 ORDER BY COUNT(Id) DESC
-
-Key Points to Remember:
-
-HAVING Clause Rules:
-
-Must be used with GROUP BY
-Can only reference:
-
-Aggregate functions
-Fields in the GROUP BY clause
-Fields that are functionally dependent on GROUP BY fields
-
-
-
-
-Common Aggregate Functions:
-
-COUNT()
-SUM()
-AVG()
-MIN()
-MAX()
-
-
-SELECT
-FROM
-WHERE
-GROUP BY
-HAVING
-ORDER BY
-LIMIT
-
