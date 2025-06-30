@@ -10,12 +10,10 @@ public class Person {
         this.name = name;
     }
     
-    
     public Integer getAge() {
         return age;
     }
     
-
     // You can add validation
     public void setAge(Integer age) {
         if (age >= 0) {

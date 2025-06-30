@@ -81,3 +81,47 @@ This is mostly used for inner class. Or in a situation where we are calling meth
 Inherited sharing → invoked from another class. Works as whatever the context (with / without sharing) of the class it is invoked from. If it is not invoked from another class, then it works in user mode
 
 
+Recently while working on securing a reporting component, I used WITH SECURITY_ENFORCED in my SOQL query and thought—“Perfect, now my FLS worries are gone!”
+
+But as I dug deeper… I realized it’s not a silver bullet. Here’s what every dev should know 👇
+
+What It Actually Does
+
+1. It enforces Field-Level Security directly in SOQL.
+2. If the user doesn’t have access to a field you’re querying → the query throws a runtime error.
+Sounds great, right?
+
+But…
+
+⚠️ Real-World Limitations You Shouldn’t Ignore
+
+1. Doesn’t Work for DML
+
+WITH SECURITY_ENFORCED only works with SOQL, not DML like insert, update, or delete.
+If you want to enforce FLS during DML, use Security.stripInaccessible() instead.
+
+
+2. Doesn’t Check WHERE or ORDER BY
+
+This was surprising 😅
+If you do this:
+
+[SELECT Id, Name FROM Account
+ WHERE Compnay__c = 'test'
+ WITH SECURITY_ENFORCED];
+
+Even if the user can’t see Compnay__c, the query still runs — no error thrown.
+It only checks fields in SELECT and FROM clauses!
+
+
+3. Doesn’t Support All Relationships
+
+Traversing polymorphic fields (like WhatId, WhoId) is not supported with WITH SECURITY_ENFORCED.
+Only exceptions: Owner, CreatedBy, and LastModifiedBy.
+
+
+4. Only Tells You the First Security Violation
+
+Let’s say your query has 5 fields the user can’t access.
+You’ll only see the error for the first field that fails — not all of them.
+👉 Makes debugging a bit painful.

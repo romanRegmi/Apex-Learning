@@ -1,6 +1,6 @@
 /*
 * Open/Closed Principle : Software entities(classes, modules, functions, etc) should be open for extension, but closed (as little changes as possible) for modification. 
-* Analogy : Once a house is built, we can add new features like a porch or a swimming pool without changing the existing structure.
+* Analogy : Once a house is built, we can add new features like a porch or a swimming pool (extend) without changing the existing structure.
 * Explanation : Adding new functionality to the software should not need modification in the existing code.
 */
 

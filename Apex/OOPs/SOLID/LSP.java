@@ -7,6 +7,10 @@ class Bird {
     void fly() {
         // common flying behavior
     }
+
+    void makeSound(){
+        // make sound
+    };
 }
 
 class Eagle extends Bird {
@@ -19,36 +23,43 @@ class Penguin extends Bird {
     }
 }
 
-
-// 3. Liskov Substitution Principle (LSP)
-// House Analogy: Any room in the house should fulfill basic room requirements
-// - All rooms must have walls, floor, ceiling
-// - Specialized rooms add features without breaking basic room functionality
-
-// Bad Example: Breaks room contract
-class Room {
-    void addWalls() { /* add walls */ }
-    void addCeiling() { /* add ceiling */ }
+// Better approach
+interface Bird {
+    void eat();
+    void makeSound();
 }
 
-class Balcony extends Room {
-    @Override
-    void addCeiling() {
-        throw new UnsupportedOperationException("Balcony has no ceiling");
-        // Breaks LSP because it doesn't fulfill Room contract
-    }
+interface Flyable {
+    void fly();
 }
 
-// Good Example: Proper inheritance hierarchy
-interface RoomStructure {
-    void addWalls();
+class Eagle implements Bird, Flyable {
+    public void fly() { /* flying implementation */ }
+    public void eat() { /* eating implementation */ }
+    public void makeSound() { /* sound implementation */ }
 }
 
-class EnclosedRoom implements RoomStructure {
-    public void addWalls() { /* add walls */ }
-    void addCeiling() { /* add ceiling */ }
+class Penguin implements Bird {
+    public void eat() { /* eating implementation */ }
+    public void makeSound() { /* sound implementation */ }
+    // No fly() method - penguins simply don't implement Flyable
 }
 
-class OpenRoom implements RoomStructure {
-    public void addWalls() { /* add partial walls */ }
+// Better approach using abstract classes
+
+abstract class Bird {
+    abstract void eat();
+    abstract void makeSound();
+}
+
+abstract class FlyingBird extends Bird {
+    abstract void fly();
+}
+
+class Eagle extends FlyingBird {
+    void fly() { /* flying implementation */ }
+}
+
+class Penguin extends Bird {
+    // No fly() method at all
 }

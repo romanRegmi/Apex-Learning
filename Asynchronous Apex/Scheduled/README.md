@@ -173,3 +173,7 @@ dacabase.executebatch(b);
 
 An easier way to schedule a batch job is to call the System.scheduleBatch method without
 having to implement the Schedulable interface.
+
+
+
+We can Pause/Resume Scheduled Jobs via Apex 
