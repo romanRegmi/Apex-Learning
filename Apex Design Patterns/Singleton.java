@@ -1,15 +1,20 @@
 // Only one object of a class is instantiated.
 // Singleton Pattern
-public class SingletonExample {
-    private static SingletonExample instance;
+public class Logger {
+    private static Logger instance = null;
     
-    private SingletonExample() {}
+    // Private constructor
+    private Logger() { }
     
-    public static SingletonExample getInstance() {
-        if(instance == null) {
-            instance = new SingletonExample();
+    // Public method to return the single instance
+    public static Logger getInstance() {
+        if (instance == null) {
+            instance = new Logger();
         }
         return instance;
     }
+    
+    public void log(String message) {
+        System.debug(message);
+    }
 }
-
