@@ -33,7 +33,7 @@ public class MyTestClass {
     }
 }
 
-⑥ Use the @testVisible annotation
+Use the @testVisible annotation
 The @testVisible annotation is used to make an Apex class or method visible to test classes, even if it is defined as private. This is useful for testing methods or classes that are not accessible to test classes by default. By using the @testVisible annotation, you can ensure that your tests have access to the necessary methods and classes for testing.
 
 Example:

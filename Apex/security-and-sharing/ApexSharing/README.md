@@ -124,4 +124,5 @@ Only exceptions: Owner, CreatedBy, and LastModifiedBy.
 
 Let’s say your query has 5 fields the user can’t access.
 You’ll only see the error for the first field that fails — not all of them.
-👉 Makes debugging a bit painful.
+
+When we do not want the apex share record to be deleted upon owner change, we create a custom sharing reason. A use case can be sharing / unsharing bulk records through batch apex based on certain criteria. This way when the batch creates or deletes shares, it remains unaffected by the manual sharing reason or ownership transfers. It can also be used to identify record shares from certain specific processes.
