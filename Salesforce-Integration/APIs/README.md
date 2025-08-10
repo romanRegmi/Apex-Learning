@@ -40,21 +40,11 @@ data structure
 3. API is a URL which is consumed by Machine ( System ) communicating between 2 or more bodies ( machines ).
 
 
-1. The Actual Implementations of the API to make the Calls we use Web Services. 2. Web Services is a method of communication between two/more devices ( machine to machine ) . 3. It’s a set of standard protocols which is used to exchange the information between two/more machines. 4. WS is an interface not for humans but for machines to communicate with them for exchanging the information
+1. The Actual Implementations of the API to make the Calls we use Web Services. 
+2. Web Services is a method of communication between two/more devices ( machine to machine ) . 
+3. It’s a set of standard protocols which is used to exchange the information between two/more machines. 4. WS is an interface not for humans but for machines to communicate with them for exchanging the information
 
-Possible Ways to Integrate with Salesforce Platform 1. User Interface 2. Business Logic 3. Data
-
-CORS, or Cross-Origin Resource Sharing, is a security feature implemented in web browsers that allows web applications running at one origin (domain) to make requests for resources from a different origin. In the context of Salesforce, CORS is used to control and manage cross-origin requests to Salesforce services and APIs.
-
-
-Authentication and Authorization are two fundamental concepts in the field of security, often used in the context of controlling access to resources and systems. While they are related, they serve distinct purposes:
-
-Authentication:
-Authentication is the process of verifying the identity of a user, system, or entity attempting to access a resource or perform an action. It ensures that the entity claiming to be a particular user or system is, in fact, who they say they are. Authentication is typically based on providing credentials such as a username/password combination, a security token, biometric data, or a digital certificate.
-
-For example, when you log in to a website with your username and password, the website authenticates you by comparing the provided credentials with those stored in its database. If the credentials match, you are granted access, and if they don't, you are denied access.
-
-Authorization:
-Authorization is the process of determining what actions or resources a user or entity is allowed to access or perform after successful authentication. Once a user is authenticated, they are granted access only to the resources or operations that they have been authorized to use. Authorization is often based on roles, permissions, or access control lists (ACLs).
-
-For example, after you log in to a system successfully, your access rights may be limited to specific features or data based on your user role. A regular user might have read-only access to certain records, while an administrator may have full access to create, read, update, and delete records.
+Possible Ways to Integrate with Salesforce Platform 
+1. User Interface 
+2. Business Logic 
+3. Data
