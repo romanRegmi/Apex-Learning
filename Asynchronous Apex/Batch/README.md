@@ -289,3 +289,44 @@ The limit for a QueryLocator is 50,000,000 records, the maximum size for any que
 In addition, Iterable return types have no hard maximum scope size, unlike QueryLocator, which will not allow more than 2,000 records per execute call. Other limits may limit how many items you can actually process (e.g. heap or CPU time), but there's no inherent hard limit for scope size.
 
 Hypothetically speaking, using Iterable, you could process 100,000,000 items, or more, assuming you can somehow generate that many items in the time allotted.
+
+
+Break The Myth: No. of Batches is not always equal to Records going to be processed/ Batch Size 🤠 
+
+We would have come across the Batch classes to perform the Bulk data operations and used a Batch Size/ Scope Size to process the records in a batch.
+
+Now, we always come across or learnt that the No. of Batches will be always equal to the records that going to be processed/ Batch Size. This is not true. 😬 
+
+Let's understand this with the below examples,
+
+📌 Example 1: 
+
+No. of Records to be processed = 1000
+Batch Size = 200
+No. of Batches = 1000/ 200 = 5 (Well, the calculation is correct here)
+
+📌 Example 2: 
+
+No. of Records to be processed = 490
+Batch Size = 75
+No. of Batches = Now if your answer is 490/75 which is approximately equal to 6.5 so the No. of Batches is ~7. It is an incorrect calculation.
+
+Before we understand where our calculation went wrong, let's familiarize ourselves with some terminologies. 
+
+🌠 RetrieveChunkSize - The records from the query locator are retrieved in chunks of a given batch size.
+
+There are 3 available values for retrieveChunkSize: 100, 400, and 2000.
+
+ 🌟 If 1 <= batchSize/ scopeSize <= 100, then retrieveChunkSize = 100
+ 🌟 If 101 <= batchSize/ scopeSize <= 400, then 
+ retrieveChunkSize = 400
+ 🌟 If 401 <= batchSize/ scopeSize <= 2000, then 
+ retrieveChunkSize = 2000
+
+🌠 ExecuteChunk - The records passed to the execute() method.
+
+So, no. of batches depends upon the three parameters which are retriveChunkSize, executeChunk, and batchSize/ scopeSize. In the below snapshot, I have explained the no. of batch calculations for Example 2 🙂 
+
+Now, a question might have popped up in your brain saying "Why do I need to worry/ care about No. of Batches Calculation ?" 🤔 
+
+I totally get it. Say an example, if you are processing more than 10 million records by setting some random batch size and if you didn't calculate the no. of batches that are going to be executed before running batch class, you might end up hitting governor limits the most likely maximum number of batch Apex jobs in the Apex flex queue that are in Holding status will be 100 error 🙃 
