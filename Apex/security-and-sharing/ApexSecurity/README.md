@@ -222,3 +222,28 @@ for (Account acc : accounts) {
 }
 }
 By combining these methods, you can create a robust security framework that protects your Salesforce data and adheres to best practices, ensuring compliance and reducing vulnerabilities in your org.
+
+
+🔍What is RowCause in Apex Sharing
+
+In Apex sharing, the concept of "row cause" refers to the reason why a particular record is being shared with a user or group.
+
+🚀📊It helps determine the context or purpose behind the sharing of a specific record. 
+
+Remember, Salesforce does not enforce or validate custom row cause values; they are essentially labels that you manage and use in your Apex code to represent different sharing reasons. 
+
+🚀It's important to use meaningful and descriptive values for your custom row causes to effectively represent the different sharing reasons in your organization. 
+
+Some of the Predefined Row Causes:
+
+Manual (Schema.SObjectType.MyObject__c.RowCause.Manual) - This is used for manual sharing, where records are shared explicitly by a user.
+
+Owner (Schema.SObjectType.MyObject__c.RowCause.Owner) - This represents the record owner's implicit access to the record.
+
+ImplicitChild (Schema.SObjectType.MyObject__c.RowCause.ImplicitChild) - This is used when access is granted implicitly through a master-detail relationship. 
+
+On the other hand, the system automatically generates other types of shares based on predefined sharing calculations. 
+
+These shares are not directly editable or deletable through Apex code. They are determined by the system.
+
+However, In Apex sharing, there are two types of shares that you can control: manual shares and custom shares. 

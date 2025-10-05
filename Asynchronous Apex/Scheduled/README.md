@@ -177,3 +177,8 @@ having to implement the Schedulable interface.
 
 
 We can Pause/Resume Scheduled Jobs via Apex 
+
+ 1. Pause Scheduled Jobs:
+Use the System.pauseScheduledJob(jobId) method to temporarily halt a scheduled job.
+ 2. Resume Scheduled Jobs:
+Resume the paused jobs using System.resumeScheduledJob(jobId) without needing to delete or reschedule.
