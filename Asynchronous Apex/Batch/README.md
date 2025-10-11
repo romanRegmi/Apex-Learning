@@ -330,3 +330,8 @@ So, no. of batches depends upon the three parameters which are retriveChunkSize,
 Now, a question might have popped up in your brain saying "Why do I need to worry/ care about No. of Batches Calculation ?" 🤔 
 
 I totally get it. Say an example, if you are processing more than 10 million records by setting some random batch size and if you didn't calculate the no. of batches that are going to be executed before running batch class, you might end up hitting governor limits the most likely maximum number of batch Apex jobs in the Apex flex queue that are in Holding status will be 100 error 🙃 
+
+
+BatchApexErrorEvent is a built in event which is triggered for unhandled exception in batch class. In order to raise platform events from batch apex, we need to implement Database.RaisesPlatformEvents interface.
+
+BatchApexErrorEvent can be subscribed in LWC as well. For this, we have to import the required functions from lightning/empApi module and the channel name is '/event/BatchApexErrorEvent'.

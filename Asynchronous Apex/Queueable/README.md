@@ -145,3 +145,17 @@ Advantage of queueable apex
 - directly pass sobject or a list of sobject
 - chain the job
 - query jobid and check its status
+
+
+The System.FinalizerContext interface contains these four methods.
+1) global Id getAsyncApexJobId {} - Returns the ID of the Queueable job for which this finalizer is defined.
+
+2) global String getRequestId {} - Returns the request ID, a string that uniquely identifies the request, and can be correlated with Event Monitoring logs.
+
+3) global System.ParentJobResult getResult {} - Returns the System.ParentJobResult enum, which represents the result of the parent asynchronous Apex Queueable job to which the finalizer is attached. The enum takes these values: SUCCESS, UNHANDLED_EXCEPTION.
+
+4) global System.Exception getException {} - Returns the exception with which the Queueable job failed when getResult is UNHANDLED_EXCEPTION, null otherwise.
+
+Here's how you can attach a finalizer with the Queueable jobs
+- Define a class that implements the System.Finalizer interface.
+- Attach a finalizer within a Queueable job’s execute method. To attach the finalizer, invoke the System.attachFinalizer method, using as argument the instantiated class that implements the System.Finalizer interface.

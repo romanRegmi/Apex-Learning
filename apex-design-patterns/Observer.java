@@ -1,41 +1,92 @@
-// Observer Pattern
-public interface Observer {
-    void update(String message);
-}
+/*
+🔹 𝗢𝗯𝘀𝗲𝗿𝘃𝗲𝗿 𝗣𝗮𝘁𝘁𝗲𝗿𝗻 𝗶𝗻 𝗔𝗽𝗲𝘅 – 𝗥𝗲𝗮𝗰𝘁 𝘁𝗼 𝗖𝗵𝗮𝗻𝗴𝗲𝘀 𝗗𝘆𝗻𝗮𝗺𝗶𝗰𝗮𝗹𝗹𝘆! 🔹
 
-public class EmailObserver implements Observer {
-    public void update(String message) {
-        // Send email
+Ever needed a way to notify multiple parts of your code when something happens? Do you find yourself writing hardcoded dependencies between classes? 😵
+
+✅ 𝗦𝗼𝗹𝘂𝘁𝗶𝗼𝗻? 𝗨𝘀𝗲 𝘁𝗵𝗲 𝗢𝗯𝘀𝗲𝗿𝘃𝗲𝗿 𝗣𝗮𝘁𝘁𝗲𝗿𝗻!
+
+🔹 𝗪𝗵𝗮𝘁 𝗶𝘀 𝘁𝗵𝗲 𝗢𝗯𝘀𝗲𝗿𝘃𝗲𝗿 𝗣𝗮𝘁𝘁𝗲𝗿𝗻?
+The Observer Pattern is a publisher-subscriber model where one object (the Subject) notifies multiple registered Observers when a change occurs. This creates a loosely coupled system where components react dynamically to updates!
+
+🔥 𝗪𝗵𝘆 𝗨𝘀𝗲 𝗢𝗯𝘀𝗲𝗿𝘃𝗲𝗿 𝗶𝗻 𝗔𝗽𝗲𝘅?
+🔹 Avoids direct dependencies between objects.
+🔹 Supports dynamic subscriptions for event-driven behavior.
+🔹 Enhances scalability and flexibility in complex systems.
+
+🔥 𝗞𝗲𝘆 𝗧𝗮𝗸𝗲𝗮𝘄𝗮𝘆𝘀:
+✅ No direct dependency between OrderService and notification services.
+✅ Adding new notifications (e.g., Slack, WhatsApp) requires no modification to OrderService! 🚀
+✅ Supports dynamic subscription/unsubscription of observers.
+
+💡 𝗨𝘀𝗲 𝗰𝗮𝘀𝗲𝘀:
+🔹 Event-driven systems (e.g., order notifications, approvals).
+🔹 Audit logging for Salesforce transactions.
+🔹 Chained event handling (e.g., lead assignment, case escalations).
+*/
+
+// Without Observer
+public class OrderService {
+    public void placeOrder() {
+        EmailService.sendEmail();
+        SMSService.sendSMS();
     }
 }
 
-public class Subject {
-    private List<Observer> observers = new List<Observer>();
-    
-    public void attach(Observer observer) {
+public class EmailService {
+    public static void sendEmail() {
+        System.debug('Email Sent');
+    }
+}
+
+
+public class SMSService {
+    public static void sendEmail() {
+        System.debug('SMS Sent');
+    }
+}
+
+OrderService service = new OrderService();
+service.placeOrder(); // Directly depends on EmailService & SMSService
+
+// With Observer
+// Step 1 : Define Observer Interface
+public interface OrderObserver {
+    void onOrderPlaced();
+}
+
+// Step 2 : Create Objservers (Listeners)
+public class EmailService implements OrderObserver {
+    public void onOrderPlaced() {
+        System.debug('Order Confirmation Email');
+    }
+}
+
+public class SMSService implements OrderObserver {
+    public void onOrderPlaced() {
+        System.debug('Order Confirmation SMS');
+    }
+}
+
+// Step 3 : Create Subject (Publisher)
+public class OrderService {
+    private List<OrderObserver> observers = new List<OrderObserver>();
+
+    public void addObservers(OrderObserver observer) {
         observers.add(observer);
     }
-    
-    public void notifyObservers(String message) {
-        for(Observer obs : observers) {
-            obs.update(message);
+
+    public void placeOrder() {
+        // Notify all observers dynamically!
+        for (OrderObserver observers : observers) {
+            observer.onOrderPlaced();
         }
     }
 }
 
-// Strategy Pattern
-public interface PaymentStrategy {
-    void pay(Decimal amount);
-}
 
-public class CreditCardPayment implements PaymentStrategy {
-    public void pay(Decimal amount) {
-        // Process credit card payment
-    }
-}
+// Step 4 : Use the Observer Pattern
+OrderService service = new OrderService();
+service.addObservers(new EmailService());
+service.addObservers(new SMSService());
 
-public class PayPalPayment implements PaymentStrategy {
-    public void pay(Decimal amount) {
-        // Process PayPal payment
-    }
-}
+service.placeOrder();
