@@ -1,5 +1,5 @@
 public class Util {
-    @future // Will throw MixedDML Error if this annotation isn't used
+    @future // Will throw the MixedDML Error if this annotation isn't used
     public static void insertUserWithRole(String uname, String al, String em, String lname){
         Profile p = [SELECT Id From Profile WHERE NAME='Standard User'];
         UserRole r = [SELECT Id From UserRole WHERE NAME='COO'];

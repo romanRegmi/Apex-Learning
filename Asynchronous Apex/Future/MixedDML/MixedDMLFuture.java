@@ -15,7 +15,3 @@ public class MixedDMLFuture {
 		'romanregmi251@gmail.com', 'Regmi');
     }
 }
-
-/*
-* MixedDMLFuture.useFutureMethod();
-*/

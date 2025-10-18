@@ -86,8 +86,3 @@ You can also monitor the status of Apex jobs in the Apex Flex Queue, and reorder
 Async processes will be available in Quick Find → Apex Jobs
 
 
-It is possible we have to implements Databases.Batchable<sObject>, Queueable, Schedulable
-
-
-
-50 Queable chain jobs in one transaction. Parent can only have 1 

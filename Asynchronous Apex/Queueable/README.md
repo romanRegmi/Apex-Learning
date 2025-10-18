@@ -159,3 +159,6 @@ The System.FinalizerContext interface contains these four methods.
 Here's how you can attach a finalizer with the Queueable jobs
 - Define a class that implements the System.Finalizer interface.
 - Attach a finalizer within a Queueable job’s execute method. To attach the finalizer, invoke the System.attachFinalizer method, using as argument the instantiated class that implements the System.Finalizer interface.
+
+
+50 Queable chain jobs in one transaction. Parent can only have 1 

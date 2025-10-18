@@ -1,5 +1,7 @@
-// Only one object of a class is instantiated.
-// Singleton Pattern
+// Singleton Pattern - It's a creational design pattern which restricts the instantiation of a class to one “single” instance only within a single transaction context.
+
+// Singleton Pattern : Only one object of a class is instantiated.
+ 
 public class Logger {
     private static Logger instance = null;
     
