@@ -86,3 +86,100 @@ You can also monitor the status of Apex jobs in the Apex Flex Queue, and reorder
 Async processes will be available in Quick Find → Apex Jobs
 
 
+In the third batch, if i want just the record record that failed to roll back and not the rest of the record, can I do it? Also if I want to halt the batch execution after the failure, how can I do this?
+
+1. Rolling back only the failed record (not the entire batch):
+
+Yes, you can achieve this using the Database.update() method with allOrNone parameter set to false:
+
+apex
+public void execute(Database.BatchableContext bc, List<Account> scope) {
+    List<Database.SaveResult> results = Database.update(scope, false); // allOrNone = false
+    
+    // Process results to identify failures
+    for (Integer i = 0; i < results.size(); i++) {
+        if (!results[i].isSuccess()) {
+            // Log the error for the failed record
+            System.debug('Failed to update Account: ' + scope[i].Id);
+            for (Database.Error err : results[i].getErrors()) {
+                System.debug('Error: ' + err.getMessage());
+            }
+        }
+    }
+}
+With allOrNone = false, Salesforce will:
+
+Commit successful record updates within the batch
+Skip/fail only the problematic records
+Continue processing the remaining records in the batch
+2. Halting batch execution after failure:
+
+You can implement Database.RaisesPlatformEvents interface and use the finish method to check for failures:
+
+apex
+public class MyBatchClass implements Database.Batchable<sObject>, Database.RaisesPlatformEvents {
+    
+    public void execute(Database.BatchableContext bc, List<Account> scope) {
+        List<Database.SaveResult> results = Database.update(scope, false);
+        
+        Boolean hasFailures = false;
+        for (Database.SaveResult result : results) {
+            if (!result.isSuccess()) {
+                hasFailures = true;
+                break;
+            }
+        }
+        
+        // If you want to abort immediately on any failure in this batch
+        if (hasFailures) {
+            // You can't directly abort from execute method, but you can:
+            // 1. Set a flag in a custom setting/custom metadata
+            // 2. Or throw an exception to fail the entire batch
+            throw new BatchException('Batch execution halted due to record failures');
+        }
+    }
+    
+    public void finish(Database.BatchableContext bc) {
+        // Check if the job had failures and take action
+        AsyncApexJob job = [SELECT Id, Status, NumberOfErrors FROM AsyncApexJob WHERE Id = :bc.getJobId()];
+        
+        if (job.NumberOfErrors > 0) {
+            // Implement logic to abort remaining batches if any
+            // You could also send notifications or log errors
+        }
+    }
+}
+Alternative approach using custom settings:
+
+apex
+public class MyBatchClass implements Database.Batchable<sObject> {
+    
+    public Database.QueryLocator start(Database.BatchableContext bc) {
+        return Database.getQueryLocator('SELECT Id, Name FROM Account');
+    }
+    
+    public void execute(Database.BatchableContext bc, List<Account> scope) {
+        // Check if previous batch set abort flag
+        Batch_Control__c control = Batch_Control__c.getInstance();
+        if (control != null && control.Abort_Execution__c) {
+            return; // Skip processing
+        }
+        
+        List<Database.SaveResult> results = Database.update(scope, false);
+        
+        for (Database.SaveResult result : results) {
+            if (!result.isSuccess()) {
+                // Set abort flag for subsequent batches
+                if (control == null) {
+                    control = new Batch_Control__c(SetupOwnerId = UserInfo.getOrganizationId());
+                }
+                control.Abort_Execution__c = true;
+                upsert control;
+                break;
+            }
+        }
+    }
+}
+The key is using Database.update(records, false) for partial success and implementing custom logic with flags or exceptions to control batch execution flow.
+
+
