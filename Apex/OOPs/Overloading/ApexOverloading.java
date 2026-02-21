@@ -1,7 +1,7 @@
 /*
  * Method Overloading
 */
-public class MyClass {
+public class ApexOverloading {
     
     public static void main(){
         integer result1 = addNumbers(3, 2);

@@ -8,7 +8,7 @@ public with sharing class Email_ZipFiles {
             contentDocumentIds.add(cdl.ContentDocumentId);
         }
 
-        // Step 2: Add IDs of documents to be compressed to contentDocuments.
+        // Step 2: Add Ids of documents to be compressed to contentDocuments.
         for (ContentVersion cv : [SELECT PathOnClient, VersionData FROM ContentVersion WHERE ContentDocumentId IN :contentDocumentIds]) {
             writer.addEntry(cv.PathOnClient, cv.VersionData); // adds a file to the ZIP with a name and content
         }

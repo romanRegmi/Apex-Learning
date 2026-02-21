@@ -1,5 +1,5 @@
 @isTest
-public class testAutoLaunchedFlow {
+public class TestAutoLaunchedFlow {
     public testMethod static void testAutoLaunchedFlowMethod(){        
         Object__A objA = new Object__A(Name = 'Supplier 01', Type__c = 'Supplier');
         insert objA;

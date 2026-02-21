@@ -1,160 +1,92 @@
-# Platform Events
+# Salesforce Platform Events Guide
 
-## Streaming APIs
-Streaming events are instant notification messages that one system (the publisher) sends to another (the subscriber).
+Platform Events are a powerful **event-driven integration** feature in Salesforce. They enable real-time, secure, and scalable communication between internal Salesforce processes and external systems using a publish/subscribe (pub/sub) model.
 
-Streaming API 
-* Legacy : Generic & Push topic
-* Current : Platform Event and Change Data Capture (CDC)
+## What Are Streaming APIs?
 
+Streaming APIs provide instant notification messages from a **publisher** to one or more **subscribers**.
 
+Salesforce offers several Streaming API options:
 
-Streaming API vs Rest API
+- **Legacy Streaming API** — Generic Streaming and PushTopic events (older approach, still supported but less recommended for new development)
+- **Current Streaming APIs** — Platform Events and Change Data Capture (CDC)
 
-* Using a REST API is sometimes compared to a conversation, while making requests with Streaming APIs is more like watching a film.
-* Client-server architecture based on requests and responses. 
-* connection is closed after response is recieved
-* statless (can be cached)
+### REST API vs Streaming API
 
-flexible, suitable for many applications
+| Aspect                  | REST API                                      | Streaming API                                  |
+|-------------------------|-----------------------------------------------|------------------------------------------------|
+| Communication style     | Request-response (like a conversation)        | Long-lived connection (like watching a live stream) |
+| Connection behavior     | Connection closes after each response         | Persistent connection — server pushes data     |
+| State                   | Stateless (responses can be cached)           | Stateful (server remembers the subscription)   |
+| Best for                | On-demand data retrieval                      | Real-time updates and notifications            |
+| Data push               | Client must poll                              | Server pushes events immediately               |
+| Response format         | Flexible (JSON, XML, etc.)                    | More limited (CometD/Bayeux protocol, JSON/Avro) |
 
-various response formats
+Streaming APIs keep a long-running HTTP connection open, allowing the server to push events as they occur. This is common in social media platforms (e.g., real-time feeds on X/Twitter or Facebook).
 
+## Platform Events Overview
 
+Platform Events are built on Salesforce's **Streaming API** infrastructure and follow an **event-driven architecture** (EDA) with a **publish/subscribe** model.
 
-Streaming APIs are the opposite of REST APIs. They are a long-running request, left open, so that data can be pushed into it.
+Key characteristics:
+- Publishers create and publish events.
+- Subscribers listen on channels and receive events in near real-time.
+- Events are **immutable** — once published, they cannot be modified or deleted.
+- Platform Events **cannot be queried** using standard SOQL on the event object itself (they are not stored like regular records).
 
-presist connection with the streaming server based on long-running request and events.
+### Architecture: The Event Bus
 
-connection is not closed by client or server
+1. **Event Producer** — Creates and publishes the event (via Apex `EventBus.publish()`, Flow, Process Builder, REST API, etc.).
+2. **Event Bus** (Channel/Queue) — Salesforce's internal message bus. Events are added in strict chronological order and processed sequentially.
+3. **Event Consumer** — Subscribes to the channel (Apex triggers, external apps via CometD/Pub/Sub API, flows, etc.) and gets notified instantly when a matching event arrives.
 
-stateful : can see the last request
+This decouples systems — producers don't need to know about consumers, reducing point-to-point integrations and eliminating the need for heavy middleware in many cases.
 
-specific use cases
+Platform Events support **real-time data exchange**:
+- Inside Salesforce (internal decoupling and async processing)
+- Between Salesforce and external systems
 
-limited response format
+## Key Benefits
 
-One example of Streaming APIs can be those used by social media
-platforms (e.g. Twitter and Facebook), which provide users with real-
-time data by updating information automatically.
+### Internal Processing
+- **Asynchronous operations** — Offload heavy work from transactions
+- **Decoupled architecture** — Components communicate without direct dependencies
+- **Reliable message delivery** — At-least-once semantics
+- **Transaction independence** — Events can be published even if the transaction rolls back (configurable behavior)
 
+### External Integration
+- **Real-time notifications** to external apps
+- **Standardized messaging** format
+- **Secure communication** (OAuth, certificates)
+- **High-scale handling** (especially with High-Volume Platform Events)
 
+## Best Practices
 
-Platform Event
+### Event Design
+- Keep events focused and single-purpose
+- Include audit fields (e.g., CreatedById, CreatedDate, UUID for idempotency)
+- Choose fields wisely — only supported types: Checkbox, Date, Date/Time, Number, Text, Text Area (Long), etc.
+- Consider expected volume when selecting field types
 
-Platform Events is an integration
-capability) that use the Streaming API.
+### Publishing
+- Use bulk publishing (`List<SObject>`) when possible
+- Implement retry logic for failures
+- Handle errors gracefully (e.g., log failed publishes)
 
-Platform Event is based on "event-
-driven architectures", it follow a
-Publish/Subscribe model (aka pub/sub)
-which reduces the number of point-to-
-point integrations required within your
-tech stack - reducing the need for an
-integration layer to connect Salesforce
-with external systems.
+### Subscribing
+- Design handlers to be **idempotent** (safe to process duplicates)
+- Process events efficiently to avoid timeouts
+- Implement robust error handling and dead-letter patterns
 
+### Performance & Monitoring
+- Monitor usage via `PlatformEventUsageMetric` object
+- Consider event retention (default 24 hours)
+- Use batch/bulk publishing for high-volume scenarios
 
-Platform events exchange event data in real-time within the Salesforce platform and salesforce and external platforms. 
-
-
-Event Bus
-
-Event producer: An event producer creates an event.
-
-Event bus: The event gets added onto the event bus
-(aka channel), which operates as a queue, with a strict
-chronological order, and executes each event one
-after the other.
-
-Event consumers: Event consumers subscribe to an
-event. The moment that event gets put onto the
-event bus, the event consumer will be notified.
-
-Platform events cannot be queried.
-
-
-
-Key Benefits of Platform Events:
-
-Internal Processing:
-
-
-Asynchronous operations
-Decoupled architecture
-Reliable message delivery
-Transaction independence
-
-
-External Integration:
-
-
-Real-time notifications
-Standardized messaging
-Secure communication
-Scale handling
-
-Best Practices:
-
-Event Design:
-
-
-Keep events focused and specific
-Include necessary audit fields
-Consider volume in field selection
-
-
-Publishing:
-
-
-Use bulk publishing when possible
-Implement proper error handling
-Consider retry mechanisms
-
-
-Subscribing:
-
-
-Handle events idempotently
-Process events efficiently
-Implement error handling
-
-
-Performance:
-
-
-Monitor event usage
-Consider event retention
-Use batch publishing for high volume
-
-Limitations to Consider:
-
-Governor Limits:
-
-
-2,000 events per transaction
-24-hour retention
-Size limits per event
-
-
-Ordering:
-
-
-Events may not arrive in order
-Design for eventual consistency
-
-
-Delivery:
-
-
-At-least-once delivery
-Plan for duplicate handling
-
-
-
-Platform events cannot be queried
-
-SELECT Name,Id,ExternalId,  StartDate, EndDate, Value
+Example query to monitor published events:
+```sql
+SELECT Name, Id, ExternalId, StartDate, EndDate, Value
 FROM PlatformEventUsageMetric
 WHERE Name IN ('PLATFORM_EVENTS_PUBLISHED')
-AND StartDate>=2024-11-26T00:00:00.000Z ORDER BY StartDate
+  AND StartDate >= 2024-11-26T00:00:00.000Z
+ORDER BY StartDate

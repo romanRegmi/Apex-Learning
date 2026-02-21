@@ -1,7 +1,14 @@
+/*
+* NOTES : Notes about getters and setters
+* Making something private isn't about making it inaccessible — it's about controlling how it's accessed.
+* When a variable is public, anyone can read or write to it freely — with no rules, no validation, no checks. A getter (and setter) lets you put a gatekeeper in front of that data.
+* Suppose you store a temperature internally in Celsius, but your getter returns Fahrenheit. The outside world doesn't need to know how you store it.
+*/
+
 public class Person {
-    private string name;
+    private String name;
     private Integer age = 50;
-    
+
     public String getName() {
         return name;
     }
