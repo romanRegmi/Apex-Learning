@@ -1,5 +1,4 @@
-// 1. First, define the Platform Event
-// In Setup -> Platform Events
+// 1. First, define the Platform Event : Setup -> Platform Events
 /*
 Object Name: Order_Status_Update__e
 Fields:
