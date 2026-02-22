@@ -13,7 +13,6 @@ Design patterns can be grouped into three main categories based on their purpose
 
 **Type Of Apex Design Patterns**
 
-
 * Strategy Pattern - It’s behavioral design pattern that is used when there are multiples solutions to the same problem and solution or strategy to be selected at runtime.
 
 * Decorator Pattern - It's structural design pattern that allows the introduction of new temporary fields for processing without altering the object structure.

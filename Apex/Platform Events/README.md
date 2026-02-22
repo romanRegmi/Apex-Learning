@@ -90,3 +90,4 @@ FROM PlatformEventUsageMetric
 WHERE Name IN ('PLATFORM_EVENTS_PUBLISHED')
   AND StartDate >= 2024-11-26T00:00:00.000Z
 ORDER BY StartDate
+```
