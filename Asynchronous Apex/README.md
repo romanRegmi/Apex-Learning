@@ -151,7 +151,7 @@ public class MyBatchClass implements Database.Batchable<sObject>, Database.Raise
 }
 Alternative approach using custom settings:
 
-apex
+
 public class MyBatchClass implements Database.Batchable<sObject> {
     
     public Database.QueryLocator start(Database.BatchableContext bc) {
@@ -180,6 +180,6 @@ public class MyBatchClass implements Database.Batchable<sObject> {
         }
     }
 }
-The key is using Database.update(records, false) for partial success and implementing custom logic with flags or exceptions to control batch execution flow.
+The key is using `Database.update(records, false)` for partial success and implementing custom logic with flags or exceptions to control batch execution flow.
 
 

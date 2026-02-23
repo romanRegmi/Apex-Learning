@@ -151,3 +151,23 @@ Debugging Apex code — Trace Flags help developers identify and resolve issues 
 Analyzing performance — Trace Flags allow developers to monitor the performance of Apex code and identify any bottlenecks or inefficiencies.
 
 Debugging issues with integrations — Trace Flags can be used to debug issues with integrations between Salesforce and other systems.
+
+## Considerations
+
+`𝐖𝐈𝐓𝐇 𝐒𝐄𝐂𝐔𝐑𝐈𝐓𝐘_𝐄𝐍𝐅𝐎𝐑𝐂𝐄𝐃`
+
+Enforces object and field-level security (FLS) while respecting the class sharing model (with sharing, without sharing, or inherited sharing).
+Use this when you want FLS enforced but need control over sharing behavior.
+
+`𝐖𝐈𝐓𝐇 𝐔𝐒𝐄𝐑_𝐌𝐎𝐃𝐄`
+
+Enforces FLS, CRUD, and sharing together — regardless of the class sharing keyword.
+It behaves exactly like the logged-in user accessing data from the UI.
+
+### So which one should you use?
+
+UI-driven logic (LWC/Aura, user-triggered actions) :
+Prefer `𝐔𝐒𝐄𝐑_𝐌𝐎𝐃𝐄` for complete user-context security.
+
+Service layer, admin logic, cross-record visibility :
+Use `𝐖𝐈𝐓𝐇 𝐒𝐄𝐂𝐔𝐑𝐈𝐓𝐘_𝐄𝐍𝐅𝐎𝐑𝐂𝐄𝐃` when sharing should not be automatically enforced.
