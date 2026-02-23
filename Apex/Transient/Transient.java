@@ -5,8 +5,8 @@
 
 /*
 * Use cases for transient keyword:
-*   Sensitive Information: If your class contains sensitive information (like passwords, tokens, etc.), you might want to mark those variables as transient to avoid accidentally exposing them when the object is serialized or transferred.
-*   Calculated Fields: If your class has fields that are calculated based on other fields and don't need to be persisted, you can mark them as transient to avoid unnecessary serialization.
+* Sensitive Information: If your class contains sensitive information (like passwords, tokens, etc.), you might want to mark those variables as transient to avoid accidentally exposing them when the object is serialized or transferred.
+* Calculated Fields: If your class has fields that are calculated based on other fields and don't need to be persisted, you can mark them as transient to avoid unnecessary serialization.
 */
 
 public class MyClass{

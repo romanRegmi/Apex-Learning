@@ -1,4 +1,4 @@
-<h1>Apex Sharing</h1>
+## Apex Sharing
 
 Normally we share record using the following configurations
 * Record ownership OWD
@@ -8,18 +8,21 @@ Normally we share record using the following configurations
 
 Apex sharing is nothing but sharing the records programmatically. When all the above config options to share the record does not work for our scenario then we use apex sharing.
 
-<h3>Role Hierarchy</h3>
+### Role Hierarchy
 
 * Automatically grants record access to users above the record owner in the Hierarchy.
 * Users who need access to the same type of data can be grouped together.
 
-<h3>Sharing Rules</h3>
+### Sharing Rules
 
 * Sharing rules are automatic exceptions to the OWD settings for users who do not own the record. 
 
-1. What is a sharing rule?
 
-Ans: A sharing rule is a setting that allows you to give access to specific records to a group
+## Interview Questions
+
+## What is a sharing rule?
+
+A sharing rule is a setting that allows you to give access to specific records to a group
 of users or roles. Sharing rules can be used to extend access to records beyond the
 organization-wide default settings, which control the visibility of records to all users in an
 organization.
@@ -32,7 +35,7 @@ Public groups can be created to implement sharing rules.
 
 Public groups - A set of users that may have different profiles/roles.  
 
-<h3>Manual Sharing</h3>
+### Manual Sharing
 
 Share records individually with other users.
 A user can only share the records 
@@ -42,7 +45,7 @@ Users with full access to the record.
 Admin
 
 
-Q - If apex runs in the "without sharing" mode by default, then why do we have the "without sharing" keyword?
+### If apex runs in the `without sharing` mode by default, then why do we have the `without sharing` keyword?
 
 This is mostly used for inner class. Or in a situation where we are calling methods from multiple classes. (If any of the keywords is used in the child, then the child will run in that mode only.)
 
@@ -78,51 +81,23 @@ This is mostly used for inner class. Or in a situation where we are calling meth
 </table>
 
 
-Inherited sharing → invoked from another class. Works as whatever the context (with / without sharing) of the class it is invoked from. If it is not invoked from another class, then it works in user mode
+### Inherited sharing 
+Invoked from another class. Works as whatever the context (with / without sharing) of the class it is invoked from. If it is not invoked from another class, then it works in user mode.
 
+### What is RowCause in Apex Sharing
 
-Recently while working on securing a reporting component, I used WITH SECURITY_ENFORCED in my SOQL query and thought—“Perfect, now my FLS worries are gone!”
+In Apex sharing, the concept of "row cause" refers to the reason why a particular record is being shared with a user or group. It helps determine the context or purpose behind the sharing of a specific record. 
 
-But as I dug deeper… I realized it’s not a silver bullet. Here’s what every dev should know 👇
+Salesforce does not enforce or validate custom row cause values; they are essentially labels that you manage and use in your Apex code to represent different sharing reasons. 
 
-What It Actually Does
+It's important to use meaningful and descriptive values for your custom row causes to effectively represent the different sharing reasons in your organization. 
 
-1. It enforces Field-Level Security directly in SOQL.
-2. If the user doesn’t have access to a field you’re querying → the query throws a runtime error.
-Sounds great, right?
+Some of the Predefined Row Causes:
 
-But…
+Manual `(Schema.SObjectType.MyObject__c.RowCause.Manual)` - This is used for manual sharing, where records are shared explicitly by a user.
 
-⚠️ Real-World Limitations You Shouldn’t Ignore
+Owner `(Schema.SObjectType.MyObject__c.RowCause.Owner)` - This represents the record owner's implicit access to the record.
 
-1. Doesn’t Work for DML
+ImplicitChild `(Schema.SObjectType.MyObject__c.RowCause.ImplicitChild)` - This is used when access is granted implicitly through a master-detail relationship. 
 
-WITH SECURITY_ENFORCED only works with SOQL, not DML like insert, update, or delete.
-If you want to enforce FLS during DML, use Security.stripInaccessible() instead.
-
-
-2. Doesn’t Check WHERE or ORDER BY
-
-This was surprising 😅
-If you do this:
-
-[SELECT Id, Name FROM Account
- WHERE Compnay__c = 'test'
- WITH SECURITY_ENFORCED];
-
-Even if the user can’t see Compnay__c, the query still runs — no error thrown.
-It only checks fields in SELECT and FROM clauses!
-
-
-3. Doesn’t Support All Relationships
-
-Traversing polymorphic fields (like WhatId, WhoId) is not supported with WITH SECURITY_ENFORCED.
-Only exceptions: Owner, CreatedBy, and LastModifiedBy.
-
-
-4. Only Tells You the First Security Violation
-
-Let’s say your query has 5 fields the user can’t access.
-You’ll only see the error for the first field that fails — not all of them.
-
-When we do not want the apex share record to be deleted upon owner change, we create a custom sharing reason. A use case can be sharing / unsharing bulk records through batch apex based on certain criteria. This way when the batch creates or deletes shares, it remains unaffected by the manual sharing reason or ownership transfers. It can also be used to identify record shares from certain specific processes.
+On the other hand, the system automatically generates other types of shares based on predefined sharing calculations. 
