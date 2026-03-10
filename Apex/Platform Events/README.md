@@ -34,6 +34,19 @@ Key characteristics:
 - Events are **immutable** — once published, they cannot be modified or deleted.
 - Platform Events **cannot be queried** using standard SOQL on the event object itself (they are not stored like regular records).
 
+## Platform Event Definition
+* Publish After Commit : To have the event message published only after a transaction commits successfully.
+* Publish Immediately : To have the event message published when the publish call executes.
+* ReplayId : This field is populated by the system when the event is delivered to subscribers, refers to the position of the event in the event stream. A subscribe can store a replay Id value and use it on resubscription. 
+*EventUuId : A universally unique identifier (UUID) that identifies a platform event message. The system populates the EventUuid field, and you can't overwrite its value.
+
+## Important Notes
+* Order of Event Processing : A trigger processes platform event notifications sequentially in the order they're received. The order of events is based on the event replay ID.
+
+* Asynchronous Trigger Execution : A platform event trigger runs in its own process asynchronously and isn't part of the transaction that published the event. There might be a delay between when an event is published and when the trigger processes the event.
+
+* Automated Process System User : Platform event triggers don't run under the user who executes them (the running user) but under the Automated Process system user.
+
 ### Architecture: The Event Bus
 
 1. **Event Producer** — Creates and publishes the event (via Apex `EventBus.publish()`, Flow, Process Builder, REST API, etc.).
