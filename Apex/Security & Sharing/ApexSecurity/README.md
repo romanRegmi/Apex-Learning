@@ -141,6 +141,26 @@ Database.insert(newAcc, new Database.InsertOptions(Database.UserMode.ENFORCED));
 A Trace Flag is a special setting in Salesforce that captures detailed information about the execution of Apex code. It records various events, such as the execution of Apex methods, SOQL queries, and DML operations, and writes them to a log file. Developers can then use this log file to analyze the performance of their code and identify any issues or bottlenecks. Trace Flags can be enabled for a specific user, set of users, or for the entire organization.
 
 
+### If Apex runs in `without sharing` then why do we have the keyword `without sharing`?
+A class with no declaration behaves in whatever mode was set from the calling class or context. 
+
+When using `without sharing`, the mode is always changed to ignore the sharing rules. 
+
+Class A → with Sharing
+Class B → No sharing keyword used 
+
+Class A invoked Class B
+
+Output → Both Class A and Class B run as “with sharing” context because parent class or calling class is “with sharing”
+
+
+Class A → with sharing
+Class B → without sharing
+
+Class A invoked Class B
+
+Output → Class A runs in `with sharing` context while class B runs in `without sharing` context.
+
 ### Where to use Trace Flags?
 
 Trace Flags are commonly used for debugging and troubleshooting Apex code in the following scenarios:
