@@ -7,16 +7,13 @@
 
 
 Database.Cursor locator = Database.getCursor('SELECT Id From Contact');
-List<Contact> scope = locator.fetch(0, 200); // Start position, Number of records
+List<Contact> scope = locator.fetch(0, 200); // Start position, Number of records (Max 2000 records)
 
 // We can jump to the 800th record 
 scope = locator.fetch(800, 120);
 
 // The locator is fully serializable and can be stored and reused across multiple transactions.
 // Valid for 2 days. 
-
-
-
 public with sharing class QueryCursorDemo {
     @AuraEnabled(cacheable=true)
     public static List<Lead> getLeads(Integer startPosition, Integer numRecords){
@@ -53,7 +50,6 @@ public with sharing class QueryCursorDemo {
 
 // Best practice would be to store the cursor in a platform cache when using it to dispaly data in the frontend for pagination
 // Instead of creating the cursor again and again
-
 public with sharing class QueryCursorDemo {
     @AuraEnabled(cacheable=true)
     public static List<Lead> getLeads(Integer startPosition, Integer numRecords){
@@ -76,7 +72,6 @@ public with sharing class QueryCursorDemo {
 }
 
 
-
 // For Queueable apex
 public class QueueableCursor implements Queueable{
     private Database.Cursor locator;
@@ -90,7 +85,6 @@ public class QueueableCursor implements Queueable{
         //Create a cursor for the query
         locator = Database.getCursor('SELECT Id, Name FROM Lead');
 
-
         position = 0;
         numRecords = 0;
     }
@@ -102,16 +96,13 @@ public class QueueableCursor implements Queueable{
 
         // Fetch a chunk of records
         List<Lead> scope = locator.fetch(position, recordsToQuery);
-
-
-        // Process the records
         
+        // Process the records
         position += scope.size();
         numRecords = 200;
 
         if(position < locator.getNumRecords()){
             System.enqueueJob(this); // Call the class itself.
         }
-
     }
 }

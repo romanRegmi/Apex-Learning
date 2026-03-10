@@ -1,94 +1,55 @@
 ## What is Apex Cursor?
-Apex Cursor are a new feature that allows us to work with large datasets retrieved using SOQL queries. Unlike SOQL which returns the entire dataset at once, cursors retieve data in manageable chunks, improving performance and memory usage.
+* Apex Cursor are a feature that allows us to work with large datasets retrieved using SOQL queries. Unlike SOQL which returns the entire dataset at once, cursors retieve data in manageable chunks, improving performance and memory usage.
 
-Reduced Memory Usage
-Large SOQL queries can return massive datasets that overload
-memory. Cursors fetch data in smaller batches, reducing the
-amount of data loaded into memory at once. This frees up
-resources and improves overall system performance.
+* Cursors provide us with the ability to work with large query result sets, while not actually returning the entire result set. We can traverse a query result in parts, with the flexibility to navigate forward and back in the result set.
 
-Faster Processing
-By processing data in manageable chunks, Apex Cursors can
-iterate through large datasets quicker compared to loading
-everything at once. This translates to faster execution times for
-your Apex code that utilizes cursors.
+* Can work synchronously and asynchronously. 
 
-Transaction Boundaries
-Cursors always operate within a single transactions. This means
-developers can write Apex cursors to process large amount of
-data without worrting about exceeding transaction limits.
+```java
+Database.Cursor locator = Database.getCursor('SELECT Id FROM Contact');
+List<Contact> scope = locator.fetch(0, 200);  // Start position, Number of records (Max 2000 records)
+```
 
-Forward and Backyard Navigation
-Developers can move forward and backyard through the data set
-which brings the flexibility to manipulate data effectively.
+* Apex cursors are stateless and generate results from the offset position that is specified in the cursor.fetch method. The offsets or positions of the results must be tracked within the particular processing scenario. 
 
-01
+* Apex cursors are fully serializable and can be stored and reused acrosss multiple transacations.
 
-Creation
+### Advantages
+#### Reduced Memory Usage
+Large SOQL queries can return massive datasets that overload memory. Cursors fetch data in smaller batches, reducing the amount of data loaded into memory at once. This frees up resources and improves overall system performance.
 
-A cursor is created when a SOQL
-query is executed on a
-Database.getCursor() or
-Database.getCursorWithBinds()
-call.
+#### Faster Processing
+By processing data in manageable chunks, Apex Cursors can iterate through large datasets quicker compared to loading everything at once. This translates to faster execution times for your Apex code that utilizes cursors.
 
-04
+#### Transaction Boundaries
+Cursors always operate within a single transactions. This means developers can write Apex cursors to process large amount of data without worrting about exceeding transaction limits.
 
-Exceptions
+#### Forward and Backward Navigation
+Developers can move forward and backward through the data set. This brings flexibility to manipulate data effectively.
 
-Apex cursors throw these new
-System exceptions:
-System.FatalCursorExceptionandS
-ystem.TransientCursorException.
-Transactions that fail
-withSystem.TransientCursorExcep
-tioncan be retried.
+### Pagination Support
+Bypass SOQL Query offset limit of 2000.
 
-02
+### Limits
+* Max Rows : 50 million per transaction (Sync or Async). 100 million per day
+* Max 10k cursors per day.
+* Max 10 fetch calls per transaction.
+* Cursor is valid for 2 days.
 
-Fetch
+### Interview Questions
+#### Does reusing the same CursorId count toward the 100 milion daily limit?
+No. The daily limit (100 million records) is calculated when the cursor is first created. That is when Salesforce determines how many records the cursor points to (maximum 50 million per cursor, 100 million per day total).
 
-When a Cursor.fetch(integer
-position, integer count)method is
-invoked with an offset position and
-the count of records to fetch, the
-corresponding rows are returned
-from the cursor. The maximum
-number of rows per cursor is 50
-million, regardless of the operation
-being synchronous or
-asynchronous.
+Calling fetch() does not count toward the 100 million record limit. However, fetch() calls do count toward the 10 fetch calls per transaction limit.
 
-03
+#### What happens if records are deleted between creation ang fetch?
+If a record is:
+* Updated > You will get the updated values when you call fetch().
+* Deleted > That record will no longer be returned.
+Example:
+- You fetch 5 records.
+- One of them gets deleted.
+- If you fetch the same range again, you will only receive 4 records.
+- If new records are inserted after the cursor was created, they will not be included.
 
-# of Rows
-
-To get the number of cursor rows
-returned from the SOQL query, use
-Cursor.getNumRecords().
-
-Apex Cursor
-Limits
-
-Maximum number of rows per cursor: 50 million (both
-synchronous and asynchronous)
-
-Maximum number of fetch calls per transaction: 10 (both
-synchronous and asynchronous)
-
-Maximum number of cursors per day: 10,000 (both synchronous
-and asynchronous)
-
-technical
-
-salesfor
-
-1
-
-2
-
-1
-
-1
-
-Maximum number of rows per day (aggregate limit): 100 million
+The cursor behaves like a pointer to record Ids. If a record no longer exists, it won't be returned.

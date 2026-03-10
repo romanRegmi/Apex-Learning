@@ -27,3 +27,9 @@
 
 
 Abstract method is acts like a template and has no logic in it. Any subclass needs to implement its methods. Whereas a virtual class has a default implementation for its methods which can be overriden by subclass. An abstract class can have a virtual method and a virtual class can have an abstract method.
+
+
+## When to use which?
+* Pick an interface over an abstract class when you need to enforce a contract ensuring child classes provide specific method implementations, but you do not need to share any common code or logic.
+
+* Virtual methods should be used instead of abstract methods when you want to provide a default implementation of a method that can be optionally overridden by child classes.

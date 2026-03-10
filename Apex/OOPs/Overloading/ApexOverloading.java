@@ -5,7 +5,7 @@ public class ApexOverloading {
     
     public static void main(){
         integer result1 = addNumbers(3, 2);
-        decimal  result2 = addNumbers(3.1, 2.7);
+        decimal result2 = addNumbers(3.1, 2.7);
         
         System.debug(result1);
         System.debug(result2);
