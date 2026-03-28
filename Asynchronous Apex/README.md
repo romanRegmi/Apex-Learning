@@ -183,3 +183,7 @@ public class MyBatchClass implements Database.Batchable<sObject> {
 The key is using `Database.update(records, false)` for partial success and implementing custom logic with flags or exceptions to control batch execution flow.
 
 
+### Important
+The user who initiates the queueable call will be the running user. This is generally true for the other asynchronous types, as well (e.g. Scheduable, Batchable). There are a few exceptions, though, such as managed package post-install handlers (will be a "package user") and Platform Event Triggers (will be the Automated User).
+
+
