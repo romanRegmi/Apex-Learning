@@ -10,3 +10,8 @@ string city = [Select BillingCity
     From Account 
     Where Id = '001xx000000001oAAA']?.BillingCity;
 System.debug('Matches count: ' + city?.countMatches('San Francisco') ?? 0 );
+
+
+// Ternary
+const isPartner = this.userType === 'Partner'; // Better
+const isPartner = this.userType === 'Partner' ? true : false 
