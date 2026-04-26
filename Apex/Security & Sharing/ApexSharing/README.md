@@ -50,34 +50,34 @@ Admin
 This is mostly used for inner class. Or in a situation where we are calling methods from multiple classes. (If any of the keywords is used in the child, then the child will run in that mode only.)
 
 <table class="border">
-<thead>
-<tr>
-<th>Class Name</th>
-<th>Sharing</th>
-<th>Invocation</th>
-<th>Result</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Class A</td>
-<td>with sharing</td>
-<td>Class A calls a method in class B</td>
-<td>Both the classes run in the with sharing context because the parent class has the "with sharing" keyword</td>
-</tr>
-<tr>
-<td>Class B</td>
-<td>Neither of the sharing keyword is used</td>
-<td>Class B calls a method in class A</td>
-<td>Class A runs in the with sharing context but class B runs in the without sharing context</td>
-</tr>
-<tr>
-<td>Class C</td>
-<td>without sharing</td>
-<td>Class A calls a method in class C</td>
-<td>Class A runs in the with sharing context while class C runs in the without sharing context</td>
-</tr>
-</tbody>
+    <thead>
+        <tr>
+            <th>Class Name</th>
+            <th>Sharing</th>
+            <th>Invocation</th>
+            <th>Result</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Class A</td>
+            <td>with sharing</td>
+            <td>Class A calls a method in class B</td>
+            <td>Both the classes run in the with sharing context because the parent class has the "with sharing" keyword</td>
+        </tr>
+        <tr>
+            <td>Class B</td>
+            <td>Neither of the sharing keyword is used</td>
+            <td>Class B calls a method in class A</td>
+            <td>Class A runs in the with sharing context but class B runs in the without sharing context</td>
+        </tr>
+        <tr>
+            <td>Class C</td>
+            <td>without sharing</td>
+            <td>Class A calls a method in class C</td>
+            <td>Class A runs in the with sharing context while class C runs in the without sharing context</td>
+        </tr>
+    </tbody>
 </table>
 
 

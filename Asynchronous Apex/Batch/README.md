@@ -45,12 +45,14 @@ public class MyBatch implements Database.Batchable<sObject> {
 Life Cycle of Batch Apex (Status of jobs in the Apex Flex Queue)
 
 1. Holding : Job has been submitted and is held in the Apex flex queue until system resources become available to queue the job for processing.
-2. Queued : Job is awaiting execution.
+2. Queued : When the Jobs are tranfered from the Flex Queue to Apex Queue their status changed to **Queued**.
 3. Preparing : The start method of the job has been invoked. This status can last a few minutes depending on the size of the batch of records.
-4. Processing : Job is being processed.
+4. Processing : While executing the Jobs its status becomes **Processing**.
 5. Aborted : Job aborted by a user.
-6. Completed : Job completed with or without failures.
+6. Completed : Once the Batch job is excution is over without failuers it status is changed to **Completed**.
 7. Failed : Job experienced a system failure.
+
+If 100 requests are sent, the first 5 will be sent to **Apex Queue** and the rest 95 will be sent to **Flex Queue**. If a request in **Apex Queue** fails, it is sent back to the **Flex Queue**. 
 
 ## Invoking a batch class
 ```apex
@@ -76,64 +78,55 @@ AsyncApexJob job = [SELECT Id, Status, JobItemsProcessed, TotalJobItems, NumberO
 
 # Interview Questions
 
-1. <b>Explain the different interfaces of a batch class?</b>
-    - Database.Batchable : (Mandatory)
 
-    - Database.AllowsCallout : This interface allows the batch job to make outbound calls (callouts) to external services. It's crucial to annotate your batch class with this interface if you intend to make callouts within the execute method. Remember, callouts introduce additional governor limits and require careful handling of potential errors.
+## What are the different interface that we can use with batch apex?
+1. Database.AllowsCallouts
+2. Database.Statefull
+3. System.Schedulable
+4. System.Iterator
+5. Database.Batchabe<sObject>
 
-    - Database.Stateful: This interface enables you to maintain state information between batches during the execution of your batch job. It's particularly useful when you need to track or accumulate data throughout the processing of multiple batches. However, use this interface cautiously as it can impact performance and governor limits due to the need for additional data storage during the batch job.
+## Explain the different interfaces of a batch class?
+- Database.Batchable : (Mandatory)
 
-    - System.Iterator : //TODO
+- Database.AllowsCallout : This interface allows the batch job to make outbound calls (callouts) to external services. It's crucial to annotate your batch class with this interface if you intend to make callouts within the execute method. Remember, callouts introduce additional governor limits and require careful handling of potential errors.
 
-    - System.Schedulable : //TODO
+- Database.Stateful: This interface enables you to maintain state information between batches during the execution of your batch job. It's particularly useful when you need to track or accumulate data throughout the processing of multiple batches. However, use this interface cautiously as it can impact performance and governor limits due to the need for additional data storage during the batch job.
 
+- System.Iterator : //TODO
 
+- System.Schedulable : //TODO
 
-2. <b>Can we call future from batch ?</b>
-    - No, we get the Fatal error(System.AsyncException).
+## Can we call future from batch ?
+No, we get the Fatal error(System.AsyncException).
 
-3. <b>Can I add a additional method in a batch class?</b>
+## Can I add a additional method in a batch class?
+Yes, you can add additional methods to a batch class, as long as you follow the basic structure and syntax requirements of a batch class. 
 
-    - Yes, you can add additional methods to a batch class, as long as you follow the basic structure and syntax requirements of a batch class. 
-    
-        However, keep in mind that any additional methods you add to a batch class should not interfere with the standard functionality of the batch class. The main entry point of a batch class is the execute() method, which is called when the batch job is started, so any additional methods should not interfere with this method.
+However, keep in mind that any additional methods you add to a batch class should not interfere with the standard functionality of the batch class. The main entry point of a batch class is the execute() method, which is called when the batch job is started, so any additional methods should not interfere with this method.
 
-        Additionally, if you plan to use any additional methods in your batch class from outside the class (for example, in a test class), make sure to mark them as public so they can be accessed from other classes.
+Additionally, if you plan to use any additional methods in your batch class from outside the class (for example, in a test class), make sure to mark them as public so they can be accessed from other classes.
 
-4. <b>Can we call a batch class from another batch class?</b>
-    - Yes, we can call batch apex from batch apex in finally.
+## Can we call a batch class from another batch class?
+Yes, we can call batch apex from batch apex in finally.
 
-5. Can we call the batch apex from triggers in salesforce?
+## Can we call the batch apex from triggers in salesforce?
+Yes, it is possible. We can call a batch apex from triggers. However, this may cause the governor limit to exceed. We can only have 5 apex jobs queued or executing at a time.
 
-Yes, it is possible. We can call a batch apex from triggers. However, we should always keep in mind that we should not call batch apex from trigger every time as this
-may cause the governor limit to exceed. We can only have 5 apex jobs queued or executing at a time.
+## How to test a batch apex?
+Code is run between `Test.startTest()` and `Test.stopTest()`.
 
-6. How to test a batch apex?
+## How many batch jobs can run concurrently?
+The system can process upto 5 queued or active jobs simultaneously for each org.
 
-Code is run between Test.startTest and Test.stopTest. Any asynchronous code included within Test.startTest and Test.stopTest is executed synchronously after Test.stopTest.
+## Can we Use FOR UPDATE in SOQL using Database.QueryLocator?
+No. It will through an exception stating that "Locking is implied for each batch execution and therefore FOR UPDATE should not be specified."
 
-How many batch jobs can run concurrently?
-The system can process upto five queued or active jobs simultaneously for each org.
+## How do we track the progress of a batch apex class?
+To track a particular process of a batch apex, we use Database.BatchableContext. We have two methods in this interface `getJobId` and `getChildJobId` - id of particular execute method.
 
-Q. Can I Use FOR UPDATE in SOQL using Database.QueryLocator?
-
-No, We can't. It will through an exception stating that "Locking is implied for each batch execution and therefore FOR UPDATE should not be specified"
-
-
-
-To track a particular process of a batch apex, we use Database.BatchableContext. We have two methods in this interface
-getJObId
-getChildJObId - id of particular execute method.
-
-
-Are you looking to create a test class for a batch apex which is calling another batch Apex. The process is same you just need to make sure that you are inserting the data which is being queried in the Start method
-
-
-Q. How to use Aggregate queries in Batch Apex
-
-Aggregate queries don't work in Batch Apex because aggregate queries doesn't
-support queryMore(). They run into the error 'Aggregate query does not support
-queryMore(), use LIMIT to restrict the results to a single batch'
+## How to use Aggregate queries in Batch Apex
+Aggregate queries don't work in Batch Apex.
 To fix this error what we should do.
 
 1. Create an Apex class implements Iterator<AggregateResult>.
@@ -141,131 +134,70 @@ To fix this error what we should do.
 3. Implementing to Database.Batchable<AggregateResult>, and Using Iterable at
 start execution in Batch Apex.
 
-Q.What is the difference between database.batchable & database.batchablecontext bc?
+## What is the difference between `Database.Batchable` & `Database.BatchableContext`?
 
-1. database.batchable is an interface.
+1. `Database.Batchable` is an interface.
 
-2. database.batchableContext is a context variable which store the runtime
-information eg jobld
+2. `Database.BatchableContext` is a context variable which store the runtime
+information. 
 
-Q. Which platform event can fire from batch ?
+## Which platform event can fire from batch ?
+The `BatchApexErrorEvent` object represents a platform event associated with a batch Apex class. It is possible to fire platform events from batch apex. So whenever any error or exception occurs, you can fire platform events which can be handled by different subscriber. Batch class needs to implement `Database.RaisesPlatformEvents` interface in order to fire platform event. 
 
-The BatchApexErrorEvent object represents a platform event associated with a batch Apex
-class.
-It is possible to fire platform events from batch apex. So whenever any error or exception
-occurs, you can fire platform events which can be handled by different subscriber.
-Batch class needs to implement "Database.RaisesPlatformEvents" interface in order to fire
-platform event.
+`BatchApexErrorEvent` can be subscribed in LWC as well. For this, we have to import the required functions from lightning/empApi module and the channel name is `'/event/BatchApexErrorEvent'`.
 
-Q. Want to schedule batch job at one time only and not again. How to do it?
-System.scheduleBatch() is used to run a schedule a batch job only once for a future time. This method has got 3 parameters.
+## Want to schedule batch job at one time only and not again. How to do it?
+`System.scheduleBatch()` is used to run a schedule a batch job only once for a future time. This method has got 3 parameters.
 
-param 1 : Instance of a class that implements Database.Batchable interface.
-param 2 : Job name.
-param 3 : Time interval after which the job should start executing.
-param 4 : It's an optional parameter which will define the no. of that processed at a time. The system.scheduleBatch() returns the scheduled job Id.
-We can use the job Id to abort the job.
+* param 1 : Instance of a class that implements Database.Batchable interface.
+* param 2 : Job name.
+* param 3 : Time interval after which the job should start executing.
+* param 4 : It's an optional parameter which will define the no. of that processed at a time. 
 
-This method returns the scheduled job ID also called CronTrigger ID
+The `system.scheduleBatch()` returns the scheduled job Id.
+We can use the job Id to abort the job. This method returns the scheduled job ID also called CronTrigger ID.
 
+```
 String cronID = System.scheduleBatch(reassign, 'job example', 1);
 CronTrigger ct = [SELECT Id, TimesTriggered, NextFireTime FROM CronTrigger WHERE Id = :cronID];
+```
 
-This method is available only for batch classes and doesn't require the implementation of the Schedulable interface.
-This makes it easy to schedule a batch job for one execution.
+This method is available only for batch classes and doesn't require the implementation of the Schedulable interface. This makes it easy to schedule a batch job for one execution.
 
-Can I call Queueable from a batch?
+## Can I call Queueable from a batch?
+Yes, But you're limited to just one System.enqueueJob call per execute in the Database.Batchable class. Salesforce has imposed this limitation to prevent explosive execution.
 
-Yes, But you're limited to just one System.enqueueJob call per execute in the
-Database.Batchable class. Salesforce has imposed this limitation to prevent
-explosive execution.
+## How many records we can insert while testing batch apex?
+We have to make sure that the number of records inserted is less than or equal to the batch size of 200 because test methods can execute only one batch. We must also ensure that the Iterable returned by the start method matches the batch size.
 
-How many records we can insert while testing batch apex?
+## Let's say, I have 150 Batch jobs to execute, Will I be able to queue them in one go?
+Once you run `Database.executeBatch`, the Batch jobs will be placed in the **Apex Flex Queue** and its status becomes Holding. 
 
-We have to make sure that the number of records inserted is less than or equal to
-the batch size of 200 because test methods can execute only one batch. We must
-also ensure that the Iterable returned by the start method matches the batch size.
+The **Apex Flex Queue** has the maximum number of 100 jobs, `Database.executeBatch` throws a `LimitException` and doesn't add the job to the queue. So atmost 100 jobs can be added in one go.
 
-Q. Let's say, I have 150 Batch jobs to execute, Will I be able to queue them in one go?
+## How can you stop a Batch job?
+The `Database.executeBatch` and `System.scheduleBatch` method returns an Id that can be used in `System.abortJob` method.
 
-. Once you run Database.executeBatch, the Batch jobs will be placed in the
-Apex flex queue and its status becomes Holding. The Apex flex queue has
-the maximum number of 100 jobs, Database.executeBatch throws a
-LimitException and doesn't add the job to the queue. So atmost 100 jobs can
-be added in one go.
+## Can I query related records using Database.QueryLocator?
+Yes, You can do subquery for related records, but with a relationship subquery, the batch job processing becomes slower. A better strategy is to perform the subquery separately, from within the execute method, which allows the batch job to run faster.
 
-Q. How can you stop a Batch job?
-
-The Database.executeBatch and System.scheduleBatch method returns an Id
-that can be used in System.abortJob method.
-
-Q. Can I query related records using Database.QueryLocator?
-
-Yes, You can do subquery for related records, but with a relationship subquery, the
-batch job processing becomes slower. A better strategy is to perform the subquery
-separately, from within the execute method, which allows the batch job to run
-faster.
-
-Q. Let's say Record A has to be processed before Record B, but Record B came in the first
-Batch and Record A came in the second batch. The batch picks records which are
-unprocessed every time it runs. How will you control the processing Order?
-
-The Processing order can't be controlled, but we can bypass the record B
-processing before Record A. We can implement Database.STATEFUL and use
-one class variable to track whether Record A has processed or not. If not
-processed and Record B has come, don't process Record B. After all the
-execution completes, Record A has already been processed so Run the batch
-again, to process Record B.
-
-
-Q How can we make a batch job to skip the queue and get higher priority?
+## How can we make a batch job to skip the queue and get higher priority?
 ```apex
 Id highPriorityJobId = Database.executeBatch(new HighPriorityBatchClass(), 200);
 Boolean jobMovedToFrontOfQueue = FlexQueue.moveJobToFront(highPriorityJobId);
 ```
 
-What is the difference between the Stateful and Stateless batch jobs?
-Using Stateful Batch Apex
-If your batch process needs information that is shared across transactions, one approach is to make the Batch Apex class itself stateful by implementing the Stateful interface. This instructs Force.com to preserve the values of your static and instance variables between transactions.
-global class SummarizeAccountTotal implements Database.Batchable<sObject>, Database.Stateful{
-}
-In Short, if you need to send a mail to check the number of records passed and failed in the batch job counter, in that case, can you Stateful batch job?
-If you want to create one counter and share/ use it in each execute method use the same.
-Using Stateless Batch Apex
-Batch Apex is stateless by default. That means for each execution of your execute method, you receive a fresh copy of your object. All fields of the class are initialized, static and instance.
-global class SummarizeAccountTotal implements Database.Batchable<sObject>{
-}
+## What is the difference between the Stateful and Stateless batch jobs?
+If your batch process needs information that is shared across transactions, one approach is to make the Batch Apex class itself stateful by implementing the Stateful interface. This instructs the system to preserve the values of your static and instance variables between transactions.
+```
+global class SummarizeAccountTotal implements Database.Batchable<sObject>, Database.Stateful {}
+```
 
-In Salesforce, when you want to process data from a CSV file in a Batch class, it's generally more appropriate to use the `Database.Batchable` interface rather than `Iterable`. Here's why:
 
-    1. **Scalability**: `Database.Batchable` is designed for processing large volumes of data efficiently. It allows you to divide the data into manageable chunks (batches), making it suitable for handling CSV files with a significant number of records.
 
-    2. **Governor Limits**: Batch jobs that implement `Database.Batchable` have separate governor limits from synchronous transactions, which provides flexibility for processing large datasets without hitting the same limits.
 
-    3. **Error Handling**: `Database.Batchable` provides better error handling capabilities. You can track and manage failed records, which is essential when dealing with data from external sources like CSV files.
 
-    4. **Asynchronous Processing**: Batch jobs can run asynchronously, freeing up system resources and allowing users to continue working without waiting for data processing to complete.
 
-    5. **Automatic Checkpointing**: `Database.Batchable` automatically handles checkpointing, which is useful for resuming processing if the batch job is interrupted or needs to be rerun.
-
-To use `Database.Batchable` with a CSV file, you typically load the CSV data into a custom or standard object in Salesforce (e.g., using `Batchable`'s `start` method to query the CSV data) and then process it in batches.
-
-On the other hand, `Iterable` is more suitable when you have a relatively small amount of data to process and can load the data directly from a collection or an external source without the need for dividing it into batches. It's typically used for in-memory processing of data rather than processing large datasets from external files like CSV.
-
-What are the different interface that we can use with batch apex?
-1. Database.AllowsCallouts
-2. Database.Statefull
-3. System.Schedulable
-4. System.Iterator
-5. Database.Batchabe<sObject>
-
-Database.Batchable : Implement this interface when wanted to create an apex batch which will provide the 3 methods. (Start, execute, finish)
-
-Database.Stateful : Implement this method whenever you wanted to hold the value of variables throughout the transaction. For example to get the list of success and failed record
-
-Database.AllowsCallout : To make the API callout from apex batch
-
-System.Iterator : Create the Custom Iterator batch.
 
 
 The default size of a batch apex is 200. The max is 2000 and the min is 1 when implementing the QueryLocator. In case of System Iterator, we don't have a limitation. 
@@ -284,54 +216,112 @@ Hypothetically speaking, using Iterable, you could process 100,000,000 items, or
 all the queried record of a batch class will be of a single batch
 
 
-The limit for a QueryLocator is 50,000,000 records, the maximum size for any query (including API-based SOQL calls). The there is no hard limit for Iterable, though you're still limited by both CPU time (limit 60,000 ms/1 minute) and total start time (10 minutes); in practice, it might be hard to get up to even 50 million rows in that time, but it is likely theoretically possible.
-
-In addition, Iterable return types have no hard maximum scope size, unlike QueryLocator, which will not allow more than 2,000 records per execute call. Other limits may limit how many items you can actually process (e.g. heap or CPU time), but there's no inherent hard limit for scope size.
-
-Hypothetically speaking, using Iterable, you could process 100,000,000 items, or more, assuming you can somehow generate that many items in the time allotted.
 
 
-Break The Myth: No. of Batches is not always equal to Records going to be processed/ Batch Size 🤠 
-
-We would have come across the Batch classes to perform the Bulk data operations and used a Batch Size/ Scope Size to process the records in a batch.
-
-Now, we always come across or learnt that the No. of Batches will be always equal to the records that going to be processed/ Batch Size. This is not true. 😬 
-
-Let's understand this with the below examples,
-
-📌 Example 1: 
-
-No. of Records to be processed = 1000
-Batch Size = 200
-No. of Batches = 1000/ 200 = 5 (Well, the calculation is correct here)
-
-📌 Example 2: 
-
-No. of Records to be processed = 490
-Batch Size = 75
-No. of Batches = Now if your answer is 490/75 which is approximately equal to 6.5 so the No. of Batches is ~7. It is an incorrect calculation.
-
-Before we understand where our calculation went wrong, let's familiarize ourselves with some terminologies. 
-
-🌠 RetrieveChunkSize - The records from the query locator are retrieved in chunks of a given batch size.
-
-There are 3 available values for retrieveChunkSize: 100, 400, and 2000.
-
- 🌟 If 1 <= batchSize/ scopeSize <= 100, then retrieveChunkSize = 100
- 🌟 If 101 <= batchSize/ scopeSize <= 400, then 
- retrieveChunkSize = 400
- 🌟 If 401 <= batchSize/ scopeSize <= 2000, then 
- retrieveChunkSize = 2000
-
-🌠 ExecuteChunk - The records passed to the execute() method.
-
-So, no. of batches depends upon the three parameters which are retriveChunkSize, executeChunk, and batchSize/ scopeSize. In the below snapshot, I have explained the no. of batch calculations for Example 2 🙂 
-
-Now, a question might have popped up in your brain saying "Why do I need to worry/ care about No. of Batches Calculation ?" 🤔 
-
-I totally get it. Say an example, if you are processing more than 10 million records by setting some random batch size and if you didn't calculate the no. of batches that are going to be executed before running batch class, you might end up hitting governor limits the most likely maximum number of batch Apex jobs in the Apex flex queue that are in Holding status will be 100 error 🙃 
 
 
-BatchApexErrorEvent is a built in event which is triggered for unhandled exception in batch class. In order to raise platform events from batch apex, we need to implement Database.RaisesPlatformEvents interface.
 
-BatchApexErrorEvent can be subscribed in LWC as well. For this, we have to import the required functions from lightning/empApi module and the channel name is '/event/BatchApexErrorEvent'.
+
+
+
+
+
+
+# Scenario Based Question
+Record A has to be processed before Record B, but Record B came in the first Batch and Record A came in the second batch. The batch picks records which are unprocessed every time it runs. How will you control the processing Order?
+
+The Processing order can't be controlled, but we can bypass the record B processing before Record A. We can implement `Database.STATEFUL` and use one class variable to track whether Record A has processed or not. If not processed and Record B has come, don't process Record B. After all the
+execution completes, Record A has already been processed so Run the batch again, to process Record B.
+
+
+## How would you process data from a CSV file using a Batch class?
+In Salesforce, when you want to process data from a CSV file in a Batch class, it's generally more appropriate to use the `Database.Batchable` interface rather than `Iterable`. Here's why:
+
+1. **Scalability**: `Database.Batchable` is designed for processing large volumes of data efficiently. It allows you to divide the data into manageable chunks (batches), making it suitable for handling CSV files with a significant number of records.
+
+2. **Governor Limits**: Batch jobs that implement `Database.Batchable` have separate governor limits from synchronous transactions, which provides flexibility for processing large datasets without hitting the same limits.
+
+3. **Error Handling**: `Database.Batchable` provides better error handling capabilities. You can track and manage failed records, which is essential when dealing with data from external sources like CSV files.
+
+4. **Asynchronous Processing**: Batch jobs can run asynchronously, freeing up system resources and allowing users to continue working without waiting for data processing to complete.
+
+5. **Automatic Checkpointing**: `Database.Batchable` automatically handles checkpointing, which is useful for resuming processing if the batch job is interrupted or needs to be rerun.
+
+To use `Database.Batchable` with a CSV file, you typically load the CSV data into a custom or standard object in Salesforce (e.g., using `Batchable`'s `start` method to query the CSV data) and then process it in batches.
+
+On the other hand, `Iterable` is more suitable when you have a relatively small amount of data to process and can load the data directly from a collection or an external source without the need for dividing it into batches. It's typically used for in-memory processing of data rather than processing large datasets from external files like CSV.
+
+## Handling Failures & Rollbacks in Batch Apex
+1. Partial Success (Rolling back only failed records) : To prevent one failing record from rolling back an entire batch, use `Database.update()` with the `allOrNone` parameter set to false.
+```java
+public void execute(Database.BatchableContext bc, List<Account> scope) {
+    // allOrNone = false allows successful records to commit while others fail
+    List<Database.SaveResult> results = Database.update(scope, false); 
+    
+    for (Integer i = 0; i < results.size(); i++) {
+        if (!results[i].isSuccess()) {
+            System.debug('Failed to update Account: ' + scope[i].Id);
+            for (Database.Error err : results[i].getErrors()) {
+                System.debug('Error: ' + err.getMessage());
+            }
+        }
+    }
+}
+```
+
+## Handling Failures & Rollbacks in Batch Apex
+1. Partial Success (Continuation on partial failuers ) : To prevent one failing record from halting an entire batch, use Database.update() with the allOrNone parameter set to false.
+
+```java
+public void execute(Database.BatchableContext bc, List<Account> scope) {
+    // allOrNone = false allows successful records to commit while others fail
+    List<Database.SaveResult> results = Database.update(scope, false); 
+    
+    for (Integer i = 0; i < results.size(); i++) {
+        if (!results[i].isSuccess()) {
+            System.debug('Failed to update Account: ' + scope[i].Id);
+            for (Database.Error err : results[i].getErrors()) {
+                System.debug('Error: ' + err.getMessage());
+            }
+        }
+    }
+}
+```
+
+2. Halting Execution After Failure
+If you want to stop the entire batch job if a failure occurs in any single batch, you can use a custom flag or throw an exception.
+    
+```java
+public class MyBatchClass implements Database.Batchable<sObject>, Database.RaisesPlatformEvents {
+    
+    public void execute(Database.BatchableContext bc, List<Account> scope) {
+        List<Database.SaveResult> results = Database.update(scope, false);
+        
+        Boolean hasFailures = false;
+        for (Database.SaveResult result : results) {
+            if (!result.isSuccess()) {
+                hasFailures = true;
+                break;
+            }
+        }
+        
+        // If you want to abort immediately on any failure in this batch
+        if (hasFailures) {
+            // You can't directly abort from execute method, but you can:
+            // 1. Set a flag in a custom setting/custom metadata
+            // 2. Or throw an exception to fail the entire batch
+            throw new BatchException('Batch execution halted due to record failures');
+        }
+    }
+    
+    public void finish(Database.BatchableContext bc) {
+        // Check if the job had failures and take action
+        AsyncApexJob job = [SELECT Id, Status, NumberOfErrors FROM AsyncApexJob WHERE Id = :bc.getJobId()];
+        
+        if (job.NumberOfErrors > 0) {
+            // Implement logic to abort remaining batches if any
+            // You could also send notifications or log errors
+        }
+    }
+}
+```

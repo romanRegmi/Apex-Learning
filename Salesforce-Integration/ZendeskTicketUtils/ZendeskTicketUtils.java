@@ -1,6 +1,4 @@
 public with sharing class ZendeskTicketUtils{
-    
-
     public class TicketWrapper {
         public String body;
         public String subject;
@@ -63,4 +61,3 @@ wrapper.priority = 'Urgent';
 wrapper.subject = 'Subject';
 
 ZendeskTicketUtils.createTicket(wrapper);
-
