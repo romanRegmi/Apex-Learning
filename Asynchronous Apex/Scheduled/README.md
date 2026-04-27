@@ -1,4 +1,3 @@
-
 # Scheduled Apex
 Scheduled Apex allows you to run Apex classes at specific times, enabling you to perform maintenance tasks on a daily or weekly basis. To implement Scheduled Apex, you need to create an Apex class that implements the Schedulable interface.
 
@@ -43,55 +42,53 @@ Once a class is scheduled, you cannot edit the classes the scheduled method call
 3. Synchronous web service callouts are not supported from scheduled Apex. To make a synchronous callout, place the callout in a method annotated with **@future(callout=true)** and call this method from scheduled Apex. If scheduled Apex executes a batch job, callouts are supported from the batch class.
 
 
- 11. What are the way of monitor the schedule job ?
- Ans: There are two way of monitior the job
- 
- 1. Apex Jobs Page:
-Setup > Apex Jobs to see a list of Apex jobs, including scheduled jobs, their status, and
-execution details.
- 2. Developer Console:
-You can use the Developer Console to monitor and debug scheduled jobs. In the Developer
-Console, go to the "Query Editor" tab and execute the following query to retrieve scheduled
-jobs:
- SELECT Id, CronExpression, NextFireTime, PreviousFireTime, StartTime, EndTime, Status, 
- JobItemsProcessed, TotalJobItems, NumberOfErrors, ExtendedStatus FROM CronTrigger 
- WHERE CronJobDetail.JobType = '7'
+## Interview Questions
+
+### What are the way of monitor the schedule job ?
+There are two way of monitior the job.
+1. Apex Jobs Page:
+    Setup > Apex Jobs to see a list of Apex jobs, including scheduled jobs, their status, and execution details.
+2. Query:
+
+```java
+SELECT Id, CronExpression, NextFireTime, PreviousFireTime, StartTime, EndTime, Status, JobItemsProcessed, TotalJobItems, NumberOfErrors, ExtendedStatus FROM CronTrigger
+```
+
+### How can we stop scheduling job ?
+```java
+String jobName = 'scheduledJobName';
+CronTrigger jobTrigger = [SELECT Id FROM CronTrigger WHERE CronJobDetail.Name = :jobName LIMIT 1];
+
+// Abort the job using the CronTrigger Id
+System.abortJob(jobTrigger.Id);
+ ```
 
 
-12. How can we stop scheduling job ?
- Ans: // Retrieve the CronTrigger Id of the scheduled job String jobName = 'YourScheduledJobName';
- CronTrigger jobTrigger = [SELECT Id FROM CronTrigger WHERE CronJobDetail.Name = :jobName
- LIMIT 1];
- // Abort the job using the CronTrigger Id
- System.abortJob(jobTrigger.Id)
+### Can we call batch & future from schedule apex ?
+```java
+public class ScheduledBatchClassPractice implements Schedulable{
+ 
+    public void execute(SchedulableContext sc){
+        try{
+            BatchClassPractice btch = new BatchClassPractice(); // You can call batch class from schedule apex
+            database.executeBatch(btch,400);
 
+            // Call the future method in schedulable apex
+            futureMethodExample.MyFutureMethod1();
+        }catch(exception e){
+            System.debug('Exception in ScheduledBatchClassPractice: ' + e.getMessage());
+        }
 
- Can we call batch from schedule apex ?
- Ans - Yes, We can call batch from schedule apex.
-public class ScheduledBatchClassPractice implements schedulable{
- 
- public void execute(SchedulableContext sc){
- try{
-BatchClassPractice btch = new BatchClassPractice(); // You can call batch class from schedule apex
- database.executeBatch(btch,400);
- 
- // Call the future method in schedulable apex
- futureMethodExample.MyFutureMethod1();
- }catch(exception e){
- System.debug('Exception in ScheduledBatchClassPractice: ' + e.getMessage());
- }
- 
- }
+    }
 }
+```
 
-Q. What are limitations of Scheduled Apex?
-
+### What are limitations of Scheduled Apex?
 1. We can schedule only 100 jobs at a time.
-2. Max no. of apex schedule jobs in 24 hours is 2,50,000 number of jobs (can change with
-salesforce updates).
+2. Max no. of apex schedule jobs in 24 hours is 2,50,000 number of jobs.
 3. Synchronous WebService callouts are not supported in schedulable Apex.
 
-Does the apex scheduler run in system mode?
+### Does the apex scheduler run in system mode?
 The scheduler runs in system mode. All classes are executed, whether or not the user has permission to execute the class. 
 
 
@@ -106,7 +103,7 @@ For example, if a managed package includes a schedulable class, it must be `glob
 
 Here's a simplified example of a schedulable class:
 
-```apex
+```java
 global class MySchedulableClass implements Schedulable {
     global void execute(SchedulableContext sc) {
         // Your scheduled logic here
@@ -162,17 +159,6 @@ Q. Write an expression to schedule an operation on Jan Tuesday 12:30 ?
 'Month' : 1
 'Day-Week' : 3
 'Optional Year': -
-
-
-Q. How to Call batch apex from schedulable class?
-
-Create instance of batchClass and then pass the instance in database.executebatch
-
-batchable b = new batchable();
-dacabase.executebatch(b);
-
-An easier way to schedule a batch job is to call the System.scheduleBatch method without
-having to implement the Schedulable interface.
 
 
 

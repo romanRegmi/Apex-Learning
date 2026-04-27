@@ -1,3 +1,8 @@
+/*
+* Setup objects cannot be updated with non-setup objects because it might cause data visibility issues. 
+* We might change the account owner’s profile and now the new profile might not even have the view permission on the account whereas you updated the account in the same transaction.
+*/
+
 public class Util {
     @future // Will throw the MixedDML Error if this annotation isn't used
     public static void insertUserWithRole(String uname, String al, String em, String lname){

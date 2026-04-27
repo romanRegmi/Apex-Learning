@@ -43,114 +43,103 @@ Here, we are talking about enqueuing jobs in the anynomous window. Say you have 
 Although queueable can accept non-primitive, we don't usually pass the records. We pass their ids. and query the records. This prevents data loss. 
 
 
-2. Can I do callouts from a Queueable Job?
-- Yes, you have to implement the Database.AllowsCallouts interface to do callouts from Queueable Jobs.
+# Salesforce Asynchronous Apex Reference
 
+## 1. Batch Apex: QueryLocator vs. Iterable
+The `start` method defines the execution scope. Use the table below to choose the correct implementation.
 
-6. Can we call future and batch from Queueable ?
-Ans: Yes we can call future and batch from Queueable and vice-versa.
+| Feature | Database.QueryLocator | Iterable |
+| :--- | :--- | :--- |
+| **Record Limit** | 50 Million Records | No hard limit (Theoretical) |
+| **Max Batch Size** | 2,000 | No hard limit (Constrained by Heap/CPU) |
+| **Data Source** | Standard SOQL Query | Lists, Sets, or Custom Logic |
+| **Governor Limits** | Bypassed (for total records) | Fully Enforced |
+| **Best Use Case** | Standard SObject processing | Complex filtering or non-SObject data |
+
+---
+
+## 2. Queueable Apex vs. @future
+Choose the right asynchronous tool based on the complexity of the task.
+
+### Use `@future` When:
+* **Simplicity is key:** Quick, straightforward tasks.
+* **Non-Serializable Data:** You need to work with data types that cannot be passed between transactions.
+* **Isolated Processing:** No need to chain multiple jobs together.
+
+### Use `Queueable` When:
+* **Complex Workflows:** You need to chain jobs (up to 50 deep) or manage dependencies.
+* **SObject Support:** You want to pass full SObjects or Collections directly into the job.
+* **Monitoring:** You require a `JobId` to track progress via the `AsyncApexJob` table.
+* **Callouts:** You need to perform web service calls by implementing `Database.AllowsCallouts`.
+
+---
+
+## 3. Advanced Implementation Details
+
+### Queueable Context & Chaining
+* **Execution Context:** Unlike Batch Apex, Queueable jobs do not process in batches. 200 records passed to a Queueable job are processed in a single execution context.
+* **Testing Chaining:** Job chaining is not supported in Apex Unit Tests. Use `Test.isRunningTest()` to guard your `System.enqueueJob()` calls.
+* **Async Calls:** Queueable jobs can successfully call `@future` methods, Batch Apex, and other Queueable jobs and vice-versa.
+
+```java
+
 public class QueuableApexExample implements Queueable {
-public static void execute(QueueableContext QC){
-Account act = new Account(Name = 'Tested Accctt 97', Phone='0523124578',
-isAddress__c=true);
-insert act;
-futureMethodExample.MyFutureMethod1();
+    public static void execute(QueueableContext QC){
+        Account act = new Account(Name='', Phone='',
+        isAddress__c=true);
+        insert act;
+        
+        //Call future method
+        futureClass.futureMethod();
+    }
 }
-}
+```
 
-Q. I have 200 records to be processed using Queueable Apex, How Can I divide the execution Context for every 100 records?
-Similar to future jobs, queueable jobs don't process batches, so you can't divide the execution Context. It will process all 200 records, in a single execution Context 
+### Transaction Finalizers
+Finalizers allow you to attach post-action logic to a Queueable job to handle success or failure scenarios (e.g., retrying a failed callout).
+* **Max Retries:** A failed job can be re-enqueued up to **5 times**.
+* **Core Methods:**
+  * `getResult()`: Returns `SUCCESS` or `UNHANDLED_EXCEPTION`.
+  * `getException()`: Retrieves the error details during failure.
+  * `getAsyncApexJobId()`: Links the finalizer to the parent job.
 
+Example: We try to make a callout to an extemnal platform, because of network issue, if the callout fails, how do we make sure that the callout is made again and re-enqueued?
+We need to get the jobId after the callout is made, then check the status of the Job, if it failed then we need to re-enqueue it manually.
 
+---
 
-
-`@future` methods and Queueable Apex both provide asynchronous processing in Salesforce, but they have different use cases and considerations. Here are situations when you might choose one over the other:
-
-**Use `@future` Methods When:**
-
-1. **Simplicity**: If you have a simple, straightforward task that doesn't require chaining multiple jobs or complex logic, `@future` methods are easier to implement.
-
-2. **Governor Limits**: `@future` methods have their own set of governor limits, which are separate from the synchronous limits. This can be beneficial when you want to perform additional processing within the same transaction and need to stay within the same set of limits.
-
-3. **Non-Serializable Data**: If your task involves non-serializable data (e.g., non-primitive data types or objects that can't be passed between transactions), `@future` methods allow you to work with these data types directly.
-
-4. **Simple Error Handling**: If you have simple error handling needs (e.g., you don't need to manage retries or complex error scenarios), `@future` methods are straightforward to work with.
-
-**Use Queueable Apex When:**
-
-1. **Complex Processing**: If your task requires more complex processing, such as chaining multiple jobs together, managing dependencies between jobs, or passing data between them, Queueable Apex provides more flexibility.
-
-2. **Error Handling and Retry**: Queueable Apex allows you to handle errors, implement retry mechanisms, and manage more complex error scenarios.
-
-3. **Bulk Processing**: If you need to process a large volume of records efficiently and want to implement bulk processing, Queueable Apex is a better choice. It allows you to divide the work into multiple Queueable jobs, which can run concurrently.
-
-4. **Long-Running Jobs**: For long-running jobs or tasks that are expected to run for a significant amount of time, Queueable Apex is preferred. It's more suitable for tasks that may span several minutes or even hours.
-
-5. **Monitoring and Debugging**: Queueable Apex provides more visibility and monitoring options, making it easier to track and manage long-running jobs or complex processing flows.
+## 4. Governor Limits Cheat Sheet
+* **Batch Apex Callouts:** 100 callouts per `execute` method run.
+* **Flex Queue:** Maximum 100 jobs.
+* **Queueable Chaining:** 50 jobs per transaction (1 in Developer Edition).
+* **Start Method Timeout:** 10 minutes for both `QueryLocator` and `Iterable`.
 
 
 
-Q. How to test Chaining?
 
-You can't chain queueable jobs in an Apex test.
-So you have to write separate test cases for each
-chained queueable job. Also, while chaining the
-jobs, add a check of Test.isRunningTest() before
-calling the enqueueJob.
 
-Test.isRunningTest() Returns true if the currently
-executing code was called by code contained in a
-test method, false otherwise
+
+
+
 
 Can I chain a job that has implemented allowCalloutsfrom a Job that doesn't have?
 Yes, callouts are also allowed in chained queueable jobs.
 
 
-Q. What is Transaction Finalizers (Beta) ?
 
-Transaction Finalizers feature enables you to attach actions, using
-the System.Finalizer interface, to asynchronous Apex jobs that use
-the Queueable framework.
 
-Before Transaction Finalizers, there was no direct way for you to
-specify actions to be taken when asynchronous jobs succeeded or
-failed. With transaction finalizers, you can attach a post-action
-sequence to a Queueable job and take relevant actions based on
-the job execution result.
-
-A Queueable job that failed due to an unhandled exception can be
-successively re-enqueued five times by a Transaction.
-
-Example: We try to make a callout to an extemnal platform, because
-of network issue, if the callout fails, how do we make sure that the
-callout is made again and re-enqueued?
-
-We need to get the Jobld after the callout is made, then check the
-status of the Job, if it failed then we need to re-enqueue it manually.
-
-Salesforce team launched something called Finalizers which will
-make the whole process of re-enqueueing the failed queueable job
-so easy.
 
 We cannot re-enqueue a job more than 5 times
 
-Max job in flex queue -> 100
 max job in execution stage --> 1
 
 batch apex max number of call outs --> From every method, we can make 100 callouts. The execute method is executed multiple times in a batch apex. So, for every time the method runs, we can make 100 call outs
 
 
-Advantage of queueable apex
-
-- directly pass sobject or a list of sobject
-- chain the job
-- query jobid and check its status
-
-
 The System.FinalizerContext interface contains these four methods.
 1) global Id getAsyncApexJobId {} - Returns the ID of the Queueable job for which this finalizer is defined.
 
-2) global String getRequestId {} - Returns the request ID, a string that uniquely identifies the request, and can be correlated with Event Monitoring logs.
+2) global String   {} - Returns the request ID, a string that uniquely identifies the request, and can be correlated with Event Monitoring logs.
 
 3) global System.ParentJobResult getResult {} - Returns the System.ParentJobResult enum, which represents the result of the parent asynchronous Apex Queueable job to which the finalizer is attached. The enum takes these values: SUCCESS, UNHANDLED_EXCEPTION.
 
@@ -159,6 +148,3 @@ The System.FinalizerContext interface contains these four methods.
 Here's how you can attach a finalizer with the Queueable jobs
 - Define a class that implements the System.Finalizer interface.
 - Attach a finalizer within a Queueable job’s execute method. To attach the finalizer, invoke the System.attachFinalizer method, using as argument the instantiated class that implements the System.Finalizer interface.
-
-
-50 Queable chain jobs in one transaction. Parent can only have 1 

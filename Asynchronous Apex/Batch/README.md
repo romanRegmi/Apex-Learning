@@ -193,38 +193,45 @@ If your batch process needs information that is shared across transactions, one 
 global class SummarizeAccountTotal implements Database.Batchable<sObject>, Database.Stateful {}
 ```
 
+# Batch Apex Implementation Guide
 
+## 1. Overview
+Salesforce Batch Apex allows you to define the execution scope using either a `QueryLocator` or an `Iterable`. While `QueryLocator` is the industry standard for SOQL-based processing, `Iterable` offers flexibility for complex, non-queryable data sets.
 
+---
 
+## 2. Comparison Matrix
 
+| Feature | Database.QueryLocator | Iterable |
+| :--- | :--- | :--- |
+| **Default Batch Size** | 200 | 200 |
+| **Max Batch Size** | 2,000 | No hard limit (constrained by Heap/CPU) |
+| **Record Limit** | 50 Million Records | No hard limit (Theoretical) |
+| **Data Source** | SOQL Query | Lists, Sets, or Custom Logic |
+| **Governor Limits** | Bypassed (for total records) | Fully Enforced |
+| **Pre-processing** | Limited | High (can transform data before execution) |
 
+---
 
+## 3. Deep Dive: Choosing Your Strategy
 
-The default size of a batch apex is 200. The max is 2000 and the min is 1 when implementing the QueryLocator. In case of System Iterator, we don't have a limitation. 
+### Use `Database.QueryLocator` (Recommended)
+This is the preferred method for most scenarios. It is more efficient as it handles the cursor for you and allows you to process up to 50 million records without hitting standard SOQL governor limits.
+* **Best for:** Standard record processing where data can be filtered via SOQL.
+* **Constraint:** The batch size must be between 1 and 2,000.
 
+### Use `Iterable`
+Use this when your records cannot be identified by a simple SOQL query (e.g., records retrieved from a Callout, data requiring complex pre-calculation, or results from multiple unrelated objects).
+* **Best for:** Non-SObject data types or scenarios requiring custom logic in the `start` method.
+* **Logic:** You can perform custom logic, build a list, and then pass that data to `execute`.
+* **Constraint:** You are limited by the 60-second CPU time and 10-minute total `start` method execution time.
 
-It depends on your need , if you want to run batch on records that can be filtered by SOQL then QueryLocator is preferable, but if records that you want to bee processed by batch can not be filtered by SOQL then you will have to use iteratable. But most of the cases it will be achieved  by query locator , so query locator is preferable so just try with it if you scope is complex and can not be achieved by SOQL then go with iterable.
+---
 
-Iterable --> governor limit is enforced. We can perform some custom logic and then pass the data to execute. We can't do this with querylocator.
-
-The limit for a QueryLocator is 50,000,000 records, the maximum size for any query (including API-based SOQL calls). The there is no hard limit for Iterable, though you're still limited by both CPU time (limit 60,000 ms/1 minute) and total start time (10 minutes); in practice, it might be hard to get up to even 50 million rows in that time, but it is likely theoretically possible.
-
-In addition, Iterable return types have no hard maximum scope size, unlike QueryLocator, which will not allow more than 2,000 records per execute call. Other limits may limit how many items you can actually process (e.g. heap or CPU time), but there's no inherent hard limit for scope size.
-
-Hypothetically speaking, using Iterable, you could process 100,000,000 items, or more, assuming you can somehow generate that many items in the time allotted.
-
-all the queried record of a batch class will be of a single batch
-
-
-
-
-
-
-
-
-
-
-
+## 4. Operational Limits & Performance
+* **Total Scope:** All records queried or gathered in the `start` method belong to a single batch job.
+* **Batch Size (Scope):** While `QueryLocator` caps at 2,000, `Iterable` return types have no inherent hard maximum scope size. However, larger scopes in an `Iterable` increase the risk of hitting **Heap Size** or **CPU time** limits.
+* **Execution Time:** If you attempt to generate a massive list (e.g., 100M+ items) via an `Iterable`, the job will likely fail due to the 10-minute timeout for the `start` method.
 
 
 # Scenario Based Question
