@@ -108,28 +108,22 @@ We need to get the jobId after the callout is made, then check the status of the
 
 ---
 
-## 4. Governor Limits Cheat Sheet
+## 4. Governor Limits
 * **Batch Apex Callouts:** 100 callouts per `execute` method run.
 * **Flex Queue:** Maximum 100 jobs.
 * **Queueable Chaining:** 50 jobs per transaction (1 in Developer Edition).
 * **Start Method Timeout:** 10 minutes for both `QueryLocator` and `Iterable`.
 
+# Questions
 
-
-
-
-
-
-
-
-Can I chain a job that has implemented allowCalloutsfrom a Job that doesn't have?
+## Can I chain a job that has implemented allowCalloutsfrom a Job that doesn't have?
 Yes, callouts are also allowed in chained queueable jobs.
 
 
 
 
 
-We cannot re-enqueue a job more than 5 times
+
 
 max job in execution stage --> 1
 
@@ -148,3 +142,6 @@ The System.FinalizerContext interface contains these four methods.
 Here's how you can attach a finalizer with the Queueable jobs
 - Define a class that implements the System.Finalizer interface.
 - Attach a finalizer within a Queueable job’s execute method. To attach the finalizer, invoke the System.attachFinalizer method, using as argument the instantiated class that implements the System.Finalizer interface.
+
+
+We cannot re-enqueue a job more than 5 times
