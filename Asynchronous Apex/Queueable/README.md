@@ -38,6 +38,8 @@ public class SomeClass implements Queueable {
 
 - You can add up to 50 jobs to the queue with `System.enqueueJob()` in a single transaction, which provides more flexibility for parallel processing of tasks. Note : Not to confuse with job chaining. --> Job chaining happens when another queueable is called in the execute method of a queueable. When this happens, the chained method is a part of a different transaction. 
 
+- Queueable apex runs under the context of the user that enqueued the job.
+
 Here, we are talking about enqueuing jobs in the anynomous window. Say you have 80 queueable. None of them are chained. You call all of them at once jobId1, jobId2.... jobId80. Then, this will not work. 
 
 Although queueable can accept non-primitive, we don't usually pass the records. We pass their ids. and query the records. This prevents data loss. 

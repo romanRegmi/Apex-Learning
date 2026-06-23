@@ -104,3 +104,13 @@ WHERE Name IN ('PLATFORM_EVENTS_PUBLISHED')
   AND StartDate >= 2024-11-26T00:00:00.000Z
 ORDER BY StartDate
 ```
+
+Platform events run under Automated Process context. If we want to define who uses platform events, we can use the following. 
+```xml
+<?xml version="1.0" encoding="UTF-8"?> 
+  <PlatformEventSubscriberConfig xmlns="http://soap.sforce.com/2006/04/metadata"> <masterLabel>MyPlatformEventTriggerConfig</masterLabel> <platformEventConsumer>MyPlatformEventTrigger</platformEventConsumer> 
+  <user>integration.user@myorg.com</user> 
+  <batchSize>200</batchSize> 
+  <isProtected>false</isProtected> 
+</PlatformEventSubscriberConfig> 
+```
