@@ -105,8 +105,23 @@ Finalizers allow you to attach post-action logic to a Queueable job to handle su
   * `getException()`: Retrieves the error details during failure.
   * `getAsyncApexJobId()`: Links the finalizer to the parent job.
 
-Example: We try to make a callout to an extemnal platform, because of network issue, if the callout fails, how do we make sure that the callout is made again and re-enqueued?
-We need to get the jobId after the callout is made, then check the status of the Job, if it failed then we need to re-enqueue it manually.
+### We try to make a callout to an extemnal platform, because of network issue, if the callout fails, how do we make sure that the callout is made again and re-enqueued?
+We need to get the `jobId` after the callout is made, then check the status of the Job. Tf it failed, then we need to re-enqueue it manually.
+
+---
+
+The **System.FinalizerContext** interface contains these four methods.
+1) global Id getAsyncApexJobId - Returns the Id of the Queueable job for which this finalizer is defined.
+
+2) global String - Returns the request ID, a string that uniquely identifies the request, and can be correlated with Event Monitoring logs.
+
+3) global System.ParentJobResult getResult - Returns the System.ParentJobResult enum, which represents the result of the parent asynchronous Apex Queueable job to which the finalizer is attached. The enum takes these values: SUCCESS, UNHANDLED_EXCEPTION.
+
+4) global System.Exception getException - Returns the exception with which the Queueable job failed when getResult is UNHANDLED_EXCEPTION, null otherwise.
+
+Here's how you can attach a finalizer with the Queueable jobs
+- Define a class that implements the System.Finalizer interface.
+- Attach a finalizer within a Queueable job’s execute method. To attach the finalizer, invoke the System.attachFinalizer method, using as argument the instantiated class that implements the System.Finalizer interface.
 
 ---
 
@@ -116,34 +131,15 @@ We need to get the jobId after the callout is made, then check the status of the
 * **Queueable Chaining:** 50 jobs per transaction (1 in Developer Edition).
 * **Start Method Timeout:** 10 minutes for both `QueryLocator` and `Iterable`.
 
-# Questions
+---
 
-## Can I chain a job that has implemented allowCalloutsfrom a Job that doesn't have?
+## Questions
+
+### Can I chain a job that has implemented allowCallouts from a Job that doesn't have it implemented?
 Yes, callouts are also allowed in chained queueable jobs.
 
+### How many jobs can we have in the execution stage?
+We can have a max of 1 job in the execution stage.
 
-
-
-
-
-
-max job in execution stage --> 1
-
-batch apex max number of call outs --> From every method, we can make 100 callouts. The execute method is executed multiple times in a batch apex. So, for every time the method runs, we can make 100 call outs
-
-
-The System.FinalizerContext interface contains these four methods.
-1) global Id getAsyncApexJobId {} - Returns the ID of the Queueable job for which this finalizer is defined.
-
-2) global String   {} - Returns the request ID, a string that uniquely identifies the request, and can be correlated with Event Monitoring logs.
-
-3) global System.ParentJobResult getResult {} - Returns the System.ParentJobResult enum, which represents the result of the parent asynchronous Apex Queueable job to which the finalizer is attached. The enum takes these values: SUCCESS, UNHANDLED_EXCEPTION.
-
-4) global System.Exception getException {} - Returns the exception with which the Queueable job failed when getResult is UNHANDLED_EXCEPTION, null otherwise.
-
-Here's how you can attach a finalizer with the Queueable jobs
-- Define a class that implements the System.Finalizer interface.
-- Attach a finalizer within a Queueable job’s execute method. To attach the finalizer, invoke the System.attachFinalizer method, using as argument the instantiated class that implements the System.Finalizer interface.
-
-
+### How many times cana job be re-enqueued?
 We cannot re-enqueue a job more than 5 times

@@ -28,22 +28,6 @@ It depends on your specific needs.
 In general, webhooks are a more efficient and scalable solution than polling.
 
 
-1. An API is an Application Programming Interface. It is an interface for the machine. 
-2. API provides the information, how to communicate with different software components. Defining the
-1. Operations ( What to Call ) . For Example, GET,
-POST, DELETE, PUT, PATCH
-2. Inputs ( What to send with a Call ) . Example, Id in
-the URL or a complete json/ xml body
-3. Output ( What you get back from the call ).
-4. Object Structure ( Object Data Types ) . JSON/XML
-data structure
-3. API is a URL which is consumed by Machine ( System ) communicating between 2 or more bodies ( machines ).
-
-
-1. The Actual Implementations of the API to make the Calls we use Web Services. 
-2. Web Services is a method of communication between two/more devices ( machine to machine ) . 
-3. It’s a set of standard protocols which is used to exchange the information between two/more machines. 4. WS is an interface not for humans but for machines to communicate with them for exchanging the information
-
 Possible Ways to Integrate with Salesforce Platform 
 1. User Interface 
 2. Business Logic 

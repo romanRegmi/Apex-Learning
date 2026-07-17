@@ -56,17 +56,6 @@ if (Schema.SObjectType.Account.𝐢𝐬𝐀𝐜𝐜𝐞𝐬𝐬𝐢𝐛𝐥𝐞(
  }
 ```
 
-### Mastering Apex Security in Salesforce — WITH USER_MODE vs WITH SECURITY_ENFORCED vs stripInaccessible() 🔐⚙️
-
-🔷 1️⃣ Understanding Field & Object-Level Security — Why It Matters 🔎
-✅ Apex runs in system mode by default, meaning it ignores field- and object-level security (FLS/OLS) unless explicitly handled
-✅ To comply with data visibility rules and avoid exposing sensitive data, you must enforce these manually
-💡 Tip for Admin: Apex bypasses security unless you instruct it otherwise. This is critical in managed packages, public sites, or API integrations.
-
-🔷 2️⃣ stripInaccessible() — Clean Your Data After You Query 🧹
-✅ Filters out fields not accessible to the current user (FLS/OLS) after a query or DML
-✅ Used for read, create, and update operations
-
 
 ```java
 // Example: Read-safe query
@@ -88,23 +77,6 @@ public static Opportunity getFinDetails(Id oppId){
     return (Database.query(String.escapeSingleQuotes(soql))); //prevent injection attack
 }
 ```
-
-
-🔷 3️⃣ WITH SECURITY_ENFORCED 🔐
-✅ Enforces FLS and OLS at the SOQL level
-✅ Throws a runtime exception if a field or object is inaccessible
-✅ Available in Apex SELECT queries only
-- `WITH SECURITY_ENFORCED` is not applied for the fields used in the WHERE clause.
-- `WITH SECURITY_ENFORCED` is not applied for polymorphic fields (Owner, Task.WhatId, etc).
-- `WITH SECURITY ENFORCED` finds only the first error.
-It cannot enforce sharing rules.
-If any of the fields or objects access is not there for the user, then a query Exception is thrown. No data is returned.
-
-```java
-// Safe SOQL
-Account[] accs = [SELECT Id, Name FROM Account WITH SECURITY_ENFORCED];
-```
-⚠️ Caution: This throws an exception if the user doesn’t have access. Use try-catch to gracefully handle failures in custom UIs. When applying field-level security in a SOQL query, don't use `WITH SECURITY_ENFORCED` rather use `WITH USER_MODE`.
 
 🧠 Best Insight: Precise Apex queries with explicit access enforcement and failure detection.
 
@@ -128,7 +100,6 @@ Database.insert(newAcc, new Database.InsertOptions(Database.UserMode.ENFORCED));
 🧠 Best Practices for Apex Developers:
 
 ✔️ Always use FLS checks in Apex — Apex ignores security by default
-✔️ Prefer WITH SECURITY_ENFORCED for clean query failures, and stripInaccessible() for silent sanitization
 
 ✔️ Use UserMode.ENFORCED in controller classes or flow-triggered invocable Apex
 
@@ -171,23 +142,3 @@ Debugging Apex code — Trace Flags help developers identify and resolve issues 
 Analyzing performance — Trace Flags allow developers to monitor the performance of Apex code and identify any bottlenecks or inefficiencies.
 
 Debugging issues with integrations — Trace Flags can be used to debug issues with integrations between Salesforce and other systems.
-
-## Considerations
-
-`𝐖𝐈𝐓𝐇 𝐒𝐄𝐂𝐔𝐑𝐈𝐓𝐘_𝐄𝐍𝐅𝐎𝐑𝐂𝐄𝐃`
-
-Enforces object and field-level security (FLS) while respecting the class sharing model (with sharing, without sharing, or inherited sharing).
-Use this when you want FLS enforced but need control over sharing behavior.
-
-`𝐖𝐈𝐓𝐇 𝐔𝐒𝐄𝐑_𝐌𝐎𝐃𝐄`
-
-Enforces FLS, CRUD, and sharing together — regardless of the class sharing keyword.
-It behaves exactly like the logged-in user accessing data from the UI.
-
-### So which one should you use?
-
-UI-driven logic (LWC/Aura, user-triggered actions) :
-Prefer `𝐔𝐒𝐄𝐑_𝐌𝐎𝐃𝐄` for complete user-context security.
-
-Service layer, admin logic, cross-record visibility :
-Use `𝐖𝐈𝐓𝐇 𝐒𝐄𝐂𝐔𝐑𝐈𝐓𝐘_𝐄𝐍𝐅𝐎𝐑𝐂𝐄𝐃` when sharing should not be automatically enforced.

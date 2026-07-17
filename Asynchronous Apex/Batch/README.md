@@ -332,3 +332,6 @@ public class MyBatchClass implements Database.Batchable<sObject>, Database.Raise
     }
 }
 ```
+
+## Additional Notes
+From every method, we can make 100 callouts. The execute method is executed multiple times in a batch apex. So, for every time the method runs, we can make 100 callouts
